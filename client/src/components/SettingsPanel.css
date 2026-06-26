@@ -1,0 +1,222 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   POLASHI — Settings Panel
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Backdrop ─────────────────────────────────────────────────────────────── */
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(3px);
+  z-index: 200;
+  animation: fadeIn 0.2s ease both;
+}
+
+/* ── Panel ────────────────────────────────────────────────────────────────── */
+.settings-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 201;
+  width: min(440px, 92vw);
+  background: var(--tent-mid);
+  border: var(--border-glow);
+  box-shadow: var(--shadow-card), 0 0 60px rgba(201,145,58,0.15);
+}
+
+/* Corner ornaments */
+.settings-panel::before,
+.settings-panel::after {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-color: var(--gold-dim);
+  border-style: solid;
+  pointer-events: none;
+}
+.settings-panel::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
+.settings-panel::after  { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.settings-panel__header {
+  padding: var(--space-lg) var(--space-xl) var(--space-md);
+  text-align: center;
+  border-bottom: var(--border-ornate);
+}
+.settings-panel__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: 4px;
+}
+.settings-panel__ornament {
+  color: var(--gold-dim);
+  font-size: 0.7rem;
+}
+.settings-panel__title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--parchment-light);
+  letter-spacing: 0.05em;
+}
+.settings-panel__subtitle {
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+/* ── Body ─────────────────────────────────────────────────────────────────── */
+.settings-panel__body {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.settings-panel__divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--parchment-deep), transparent);
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.settings-panel__footer {
+  padding: var(--space-md) var(--space-xl) var(--space-lg);
+  display: flex;
+  justify-content: center;
+  border-top: var(--border-ornate);
+}
+
+/* ── Slider ───────────────────────────────────────────────────────────────── */
+.settings-slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.settings-slider__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.settings-slider__icon {
+  font-size: 1rem;
+  color: var(--gold);
+  width: 20px;
+  text-align: center;
+}
+.settings-slider__label {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  flex: 1;
+}
+.settings-slider__value {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ── Track ────────────────────────────────────────────────────────────────── */
+.settings-slider__track-wrap {
+  position: relative;
+  height: 6px;
+  background: var(--tent-dark);
+  border: 1px solid var(--parchment-deep);
+  /* Extra height area for thumb to be clickable */
+  margin: 14px 0 4px;
+}
+
+.settings-slider__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+/* ── Native range input — transparent, sits over the track ─────────────────── */
+.settings-slider__input {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 28px;
+  transform: translateY(-50%);
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  z-index: 3;
+  -webkit-appearance: none;
+}
+
+/* ── Custom SVG Thumb ─────────────────────────────────────────────────────── */
+.settings-slider__thumb {
+  position: absolute;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: left 0.05s linear;
+  z-index: 2;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+}
+.settings-slider__thumb svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Glow on active */
+.settings-slider__track-wrap:focus-within .settings-slider__thumb {
+  filter: drop-shadow(0 0 8px rgba(201,145,58,0.8)) drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+}
+
+/* ── Ticks ────────────────────────────────────────────────────────────────── */
+.settings-slider__ticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+.settings-slider__tick {
+  width: 2px;
+  height: 4px;
+  background: var(--parchment-deep);
+  transition: background 0.15s;
+}
+.settings-slider__tick.active {
+  background: var(--gold-dim);
+}
+
+/* ── Settings gear button (shown in headers) ─────────────────────────────── */
+.settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--parchment-deep);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.settings-btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+  background: var(--tent-dark);
+}

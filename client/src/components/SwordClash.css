@@ -1,0 +1,124 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   POLASHI — Sword Clash Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.sword-clash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  padding: 16px 0;
+}
+
+.sword-clash__arena {
+  position: relative;
+  width: 320px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Swords ──────────────────────────────────────────────────────────────── */
+.sword-clash__sword {
+  position: absolute;
+  width: 70px;
+  height: 180px;
+  top: 10px;
+}
+
+/* Left sword: tip points bottom-right toward center */
+.sword-clash__sword--left {
+  left: 20px;
+  transform-origin: bottom center;
+  transform: rotate(-45deg);
+  animation: swing-left 0.7s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.8));
+}
+
+/* Right sword: tip points bottom-left toward center, mirrored */
+.sword-clash__sword--right {
+  right: 20px;
+  transform-origin: bottom center;
+  transform: rotate(45deg) scaleX(-1);
+  animation: swing-right 0.7s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 10px rgba(231, 76, 60, 0.8));
+}
+
+@keyframes swing-left {
+  from { transform: rotate(-55deg); }
+  to   { transform: rotate(-38deg); }
+}
+
+@keyframes swing-right {
+  from { transform: rotate(55deg) scaleX(-1); }
+  to   { transform: rotate(38deg) scaleX(-1); }
+}
+
+/* ── Sparks ──────────────────────────────────────────────────────────────── */
+.sword-clash__sparks {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+}
+
+.sword-clash__glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,184,75,0.6) 0%, transparent 70%);
+  animation: glow-pulse 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+  from { transform: translate(-50%,-50%) scale(0.6); opacity: 0.5; }
+  to   { transform: translate(-50%,-50%) scale(1.2); opacity: 1; }
+}
+
+.sword-clash__spark {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--gold-bright);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+}
+
+.sword-clash__spark--1 { animation: spark 0.5s 0.00s ease-out infinite; }
+.sword-clash__spark--2 { animation: spark 0.5s 0.08s ease-out infinite; }
+.sword-clash__spark--3 { animation: spark 0.5s 0.16s ease-out infinite; }
+.sword-clash__spark--4 { animation: spark 0.5s 0.24s ease-out infinite; background: #e74c3c; }
+.sword-clash__spark--5 { animation: spark 0.5s 0.32s ease-out infinite; background: #2ecc71; }
+.sword-clash__spark--6 { animation: spark 0.5s 0.40s ease-out infinite; }
+
+@keyframes spark {
+  0%   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  25%  { transform: translate(calc(-50% + var(--sx,10px)), calc(-50% + var(--sy,-20px))) scale(1.5); opacity: 0.9; }
+  100% { transform: translate(calc(-50% + var(--ex,30px)), calc(-50% + var(--ey,-40px))) scale(0); opacity: 0; }
+}
+
+.sword-clash__spark--1 { --sx: 8px;   --sy: -18px; --ex: 22px;  --ey: -45px; }
+.sword-clash__spark--2 { --sx: -10px; --sy: -15px; --ex: -28px; --ey: -40px; }
+.sword-clash__spark--3 { --sx: 14px;  --sy: -8px;  --ex: 38px;  --ey: -20px; }
+.sword-clash__spark--4 { --sx: -8px;  --sy: -20px; --ex: -20px; --ey: -50px; }
+.sword-clash__spark--5 { --sx: 6px;   --sy: 10px;  --ex: 16px;  --ey: 30px;  }
+.sword-clash__spark--6 { --sx: -12px; --sy: 8px;   --ex: -30px; --ey: 22px;  }
+
+/* ── Label ───────────────────────────────────────────────────────────────── */
+.sword-clash__label {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  animation: fadeIn 0.5s ease both;
+}
