@@ -89,7 +89,7 @@ function RoleReveal({ gameState }) {
 
 function NightPhase({ gameState }) {
   const { play } = useSound();
-  const { myIntel, players } = gameState;
+  const { myIntel, myRoleInfo, players } = gameState;
   const redNames    = myIntel.redPlayerIds.map(id => players.find(p => p.id === id)?.name).filter(Boolean);
   const yellowNames = myIntel.yellowPlayerIds.map(id => players.find(p => p.id === id)?.name).filter(Boolean);
 
