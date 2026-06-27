@@ -128,4 +128,16 @@ export const SOUNDS = {
   // File: /public/assets/sounds/tent-ambience.mp3
   // Use: Subtle looping background during War Tent phases (crickets, wind, ~30s loop)
   TENT_AMBIENCE: '/assets/sounds/tent-ambience.mp3',
+
+  // File: /public/assets/sounds/vote-result-pass.mp3
+  // Use: Overlay reveal — team approved
+  VOTE_RESULT_PASS: '/assets/sounds/vote-result-pass.mp3',
+
+  // File: /public/assets/sounds/vote-result-fail.mp3
+  // Use: Overlay reveal — team rejected
+  VOTE_RESULT_FAIL: '/assets/sounds/vote-result-fail.mp3',
+
+  // File: /public/assets/sounds/card-pick.mp3
+  // Use: Player selects a battle card
+  CARD_PICK: '/assets/sounds/card-pick.mp3',
 };

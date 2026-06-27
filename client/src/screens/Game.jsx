@@ -42,56 +42,47 @@ function RoleReveal({ gameState }) {
 
   return (
     <div className="role-reveal">
-      <p className="role-reveal__eyebrow">Your orders have arrived</p>
-
+      {/* Left — Role Card (pinned, 10% bigger) */}
       <div className="role-reveal__card animate-pulse-gold">
-        {/* Background texture placeholder */}
-        <div className="role-reveal__card-bg">
-          {/*
-            ASSET: Add a subtle parchment or faction texture here.
-            File: /public/assets/images/card-texture-nawab.png or card-texture-eic.png
-          */}
-        </div>
-
+        <p className="role-reveal__eyebrow">Your orders have arrived</p>
         <div className={`role-reveal__faction-badge ${isNawab ? 'nawab' : 'eic'}`}>
           {isNawab ? 'Nawab Pokkho' : 'EIC Pokkho'}
         </div>
-
-        {/* Role portrait — shows image if added, otherwise text fallback */}
         <div className="role-reveal__icon">
           <AssetImage
             src={IMAGES.ROLES[role]}
             alt={roleMeta.displayName}
             fallback={ROLE_FALLBACK[role] || '?'}
-            style={{ width: 80, height: 112, objectFit: 'cover' }}
+            style={{ width: 88, height: 124, objectFit: 'cover' }}
           />
         </div>
-
         <h2 className="role-reveal__name">{roleMeta.displayName}</h2>
         <p className="role-reveal__title">{roleMeta.title}</p>
         <p className="role-reveal__desc">{roleMeta.description}</p>
       </div>
 
-      {(redNames.length > 0 || yellowNames.length > 0) && (
-        <div className="role-reveal__intel-block">
-          <p className="role-reveal__intel-title">Your Intelligence</p>
-          <div className="role-reveal__intel-list">
-            {redNames.map(name    => <div key={name} className="role-reveal__intel-player intel-red">&bull; {name} &mdash; EIC Traitor</div>)}
-            {yellowNames.map(name => <div key={name} className="role-reveal__intel-player intel-yellow">&#9680; {name} &mdash; Suspect</div>)}
+      {/* Right — Intel + Actions */}
+      <div className="role-reveal__right">
+        {(redNames.length > 0 || yellowNames.length > 0) && (
+          <div className="role-reveal__intel-block">
+            <p className="role-reveal__intel-title">Your Intelligence</p>
+            <div className="role-reveal__intel-list">
+              {redNames.map(name    => <div key={name} className="role-reveal__intel-player intel-red">&bull; {name} &mdash; EIC Traitor</div>)}
+              {yellowNames.map(name => <div key={name} className="role-reveal__intel-player intel-yellow">&#9680; {name} &mdash; Suspect</div>)}
+            </div>
           </div>
-        </div>
-      )}
-
-      {!acked ? (
-        <button className="btn btn-primary" onClick={handleAck} style={{ marginTop: 'var(--space-xl)' }}>
-          I understand my orders
-        </button>
-      ) : (
-        <div>
-          <p className="role-reveal__waiting animate-flicker">Awaiting other commanders&hellip;</p>
-          <p className="role-reveal__players-ready">{readyCount} / {players.length} ready</p>
-        </div>
-      )}
+        )}
+        {!acked ? (
+          <button className="btn btn-primary" onClick={handleAck}>
+            I understand my orders
+          </button>
+        ) : (
+          <div>
+            <p className="role-reveal__waiting animate-flicker">Awaiting other commanders&hellip;</p>
+            <p className="role-reveal__players-ready">{readyCount} / {players.length} ready</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -107,11 +98,6 @@ function NightPhase({ gameState }) {
 
   return (
     <div className="night-phase">
-      {/*
-        ASSET: Night background image
-        File: /public/assets/images/night-bg.jpg
-        The BackgroundImage component in Landing and WarTent handle this automatically.
-      */}
       <h1 className="night-phase__title animate-flicker">The Night Closes In</h1>
       <p className="night-phase__desc animate-fade">
         The war tent falls silent. Look around the table. Remember what you know.
@@ -127,7 +113,12 @@ function NightPhase({ gameState }) {
         </div>
       )}
 
-      <p className="role-reveal__waiting" style={{ marginTop: 'var(--space-xl)' }}>
+      <p className="night-phase__menace animate-fade" style={{ animationDelay: '1s' }}>
+        {myRoleInfo?.faction === 'EIC'
+          ? "Smile. Conspire. And when the moment comes — bury Bengal."
+          : "The fate of Bengal rests in your hands."}
+      </p>
+      <p className="role-reveal__waiting" style={{ marginTop: 'var(--space-lg)' }}>
         Dawn approaches&hellip; the council begins shortly.
       </p>
     </div>
