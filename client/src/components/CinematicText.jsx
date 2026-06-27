@@ -11,11 +11,11 @@ export default function CinematicText({ segments, className = '' }) {
     setVisible(0);
     if (!segments || segments.length === 0) return;
 
-    // Reveal first segment immediately, then one every 1.5s
+    // Reveal first segment immediately, then one every 2s
     const timers = segments.map((_, i) => {
       return setTimeout(() => {
         setVisible(i + 1);
-      }, i * 1500);
+      }, i * 2000);
     });
 
     return () => timers.forEach(clearTimeout);

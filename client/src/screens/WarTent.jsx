@@ -109,55 +109,67 @@ function PlayerTable({ players, myId, myIntel, phase, teamProposal, selectedIds,
   const safeIntel  = { redPlayerIds: myIntel?.redPlayerIds||[], yellowPlayerIds: myIntel?.yellowPlayerIds||[] };
   const isRound    = players.length < 6;
 
-  // Round table: position seats on a circle
   const getCirclePos = (i, total) => {
     const a = (i/total)*2*Math.PI - Math.PI/2;
     const r = 42;
     return { left:`${50+r*Math.cos(a)}%`, top:`${50+r*Math.sin(a)}%` };
   };
 
+  const renderSeat = (p, idx) => {
+    const isMe       = p.id === myId;
+    const isOnTeam   = teamProposal.includes(p.id);
+    const isSelected = (selectedIds||[]).includes(p.id);
+    const isRed      = safeIntel.redPlayerIds.includes(p.id);
+    const isYellow   = safeIntel.yellowPlayerIds.includes(p.id);
+    const selectable = isProposal && !!onToggleSelect;
+    const cls = ['wt-seat',
+      isMe?'is-me':'', p.isLeader?'is-leader':'',
+      isOnTeam?'is-on-team':'', isSelected?'is-selected':'',
+      p.hasVoted?'has-voted':'', selectable?'selectable':'',
+      isRed?'intel-red':isYellow?'intel-yellow':'',
+    ].filter(Boolean).join(' ');
+    const style = isRound ? getCirclePos(idx, players.length) : {};
+    return (
+      <div key={p.id} className={cls} style={style}
+        onClick={() => selectable && onToggleSelect(p.id)}
+        role={selectable?'button':undefined}>
+        {p.isLeader && <div className="wt-seat__leader-token">Leader</div>}
+        <div className="wt-seat__avatar">
+          {p.name.charAt(0).toUpperCase()}
+          {(isOnTeam||isSelected) && <div className="wt-seat__checkmark">✓</div>}
+        </div>
+        <div className="wt-seat__name">{p.name}</div>
+        {isMe && <div className="wt-seat__you-tag">(you)</div>}
+        {p.roleMeta && <div className="wt-seat__you-tag">{p.roleMeta.displayName}</div>}
+        {votesRevealed && votes && votes[p.id] && (
+          <div className="wt-seat__voted-indicator"
+            style={{color:votes[p.id]==='YES'?'var(--nawab-bright)':'var(--eic-bright)'}}>
+            {votes[p.id]==='YES'?'✓ Yes':'✗ No'}
+          </div>
+        )}
+        {phase==='TEAM_VOTE' && !votesRevealed && p.hasVoted && <div className="wt-seat__voted-indicator">Voted</div>}
+      </div>
+    );
+  };
+
+  const rectRows = () => {
+    const topCount = Math.ceil(players.length / 2);
+    const top    = players.slice(0, topCount);
+    const bottom = players.slice(topCount);
+    return (
+      <>
+        <div className="wt-rect-row">{top.map((p,i) => renderSeat(p,i))}</div>
+        <div className="wt-rect-row">{bottom.map((p,i) => renderSeat(p,i+topCount))}</div>
+      </>
+    );
+  };
+
   return (
     <div className="wt-table-wrap">
       <div className="wt-table-title">Commanders at the Table</div>
       <div className={`wt-table ${isRound ? 'wt-table--round' : 'wt-table--rect'}`}>
-        {players.map((p, idx) => {
-          const isMe       = p.id === myId;
-          const isOnTeam   = teamProposal.includes(p.id);
-          const isSelected = (selectedIds||[]).includes(p.id);
-          const isRed      = safeIntel.redPlayerIds.includes(p.id);
-          const isYellow   = safeIntel.yellowPlayerIds.includes(p.id);
-          const selectable = isProposal && !!onToggleSelect;
-          const cls = ['wt-seat',
-            isMe?'is-me':'', p.isLeader?'is-leader':'',
-            isOnTeam?'is-on-team':'', isSelected?'is-selected':'',
-            p.hasVoted?'has-voted':'', selectable?'selectable':'',
-            isRed?'intel-red':isYellow?'intel-yellow':'',
-          ].filter(Boolean).join(' ');
-          const style = isRound ? getCirclePos(idx, players.length) : {};
-          return (
-            <div key={p.id} className={cls} style={style}
-              onClick={() => selectable && onToggleSelect(p.id)}
-              role={selectable?'button':undefined}>
-              {p.isLeader && <div className="wt-seat__leader-token">Leader</div>}
-              <div className="wt-seat__avatar">
-                {p.name.charAt(0).toUpperCase()}
-                {(isOnTeam||isSelected) && <div className="wt-seat__checkmark">\u2713</div>}
-              </div>
-              <div className="wt-seat__name">{p.name}</div>
-              {isMe && <div className="wt-seat__you-tag">(you)</div>}
-              {p.roleMeta && <div className="wt-seat__you-tag">{p.roleMeta.displayName}</div>}
-              {votesRevealed && votes && votes[p.id] && (
-                <div className="wt-seat__voted-indicator"
-                  style={{color:votes[p.id]==='YES'?'var(--nawab-bright)':'var(--eic-bright)'}}>
-                  {votes[p.id]==='YES'?'\u2713 Yes':'\u2717 No'}
-                </div>
-              )}
-              {phase==='TEAM_VOTE' && !votesRevealed && p.hasVoted && <div className="wt-seat__voted-indicator">Voted</div>}
-            </div>
-          );
-        })}
-        {/* Table center emblem — only for round */}
-        {isRound && <div className="wt-table__center-emblem">\u2694</div>}
+        {isRound ? players.map((p, idx) => renderSeat(p, idx)) : rectRows()}
+        {isRound && <div className="wt-table__center-emblem">⚔</div>}
       </div>
     </div>
   );
@@ -369,9 +381,10 @@ function AssassinationPhase({ gameState }) {
 function GameOverScreen({ gameState }) {
   const myId = useGameStore(s=>s.myId);
   const { winner, players } = gameState;
-  const isNawab = winner==='NAWAB';
   // faction comes from myRoleInfo (always present), not public player list (faction stripped)
   const myFaction = gameState.myRoleInfo?.faction;
+  const iWon = (winner === 'NAWAB' && myFaction === 'NAWAB') || (winner === 'EIC' && myFaction === 'EIC');
+  const isNawab = winner==='NAWAB'; // used for colour/theme only
 
   // Pick cinematic text once on mount
   const segments = useMemo(() => {
@@ -392,7 +405,7 @@ function GameOverScreen({ gameState }) {
 
       {/* Big title */}
       <h1 className={`game-over__title${isNawab?' nawab':' eic'}`}>
-        {isNawab?'Victory':'Defeat'}
+        {iWon?'Victory':'Defeat'}
       </h1>
 
       {/* Cinematic text — segments reveal one by one */}
@@ -468,6 +481,31 @@ export default function WarTent({ gameState }) {
       {showSettings && <SettingsPanel onClose={()=>setShowSettings(false)} />}
       <main className="wt-main">{renderMain()}</main>
       <aside className="wt-sidebar">
+        {myRoleInfo && (() => {
+          const { role, faction, roleMeta } = myRoleInfo;
+          const isNawabRole = faction === 'NAWAB';
+          const redNames    = myIntel?.redPlayerIds?.map(id => players.find(p=>p.id===id)?.name).filter(Boolean)||[];
+          const yellowNames = myIntel?.yellowPlayerIds?.map(id => players.find(p=>p.id===id)?.name).filter(Boolean)||[];
+          return (
+            <div className="wt-my-role-card">
+              <p className="wt-my-role-card__eyebrow">Your Role</p>
+              <div className={`wt-my-role-card__faction ${isNawabRole?'nawab':'eic'}`}>
+                {isNawabRole ? 'Nawab Pokkho' : 'EIC Pokkho'}
+              </div>
+              <div className="wt-my-role-card__icon">{ROLE_ICONS[role]||'?'}</div>
+              <h3 className="wt-my-role-card__name">{roleMeta.displayName}</h3>
+              <p className="wt-my-role-card__title">{roleMeta.title}</p>
+              <p className="wt-my-role-card__desc">{roleMeta.description}</p>
+              {(redNames.length > 0 || yellowNames.length > 0) && (
+                <div className="wt-my-role-card__intel">
+                  <p className="wt-my-role-card__intel-title">Your Intelligence</p>
+                  {redNames.map(n => <div key={n} className="wt-my-role-card__intel-item red">• {n} — EIC Traitor</div>)}
+                  {yellowNames.map(n => <div key={n} className="wt-my-role-card__intel-item yellow">◐ {n} — Suspect</div>)}
+                </div>
+              )}
+            </div>
+          );
+        })()}
         <PuzzleMap chapterScores={chapterScores} currentChapter={chapter} />
         <MissionLog history={missionHistory} />
       </aside>

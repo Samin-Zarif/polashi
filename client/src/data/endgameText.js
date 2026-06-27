@@ -9,7 +9,7 @@ export const ENDGAME_TEXT = {
     [
       "And thus began the dark days of Bengal.",
       "What was lost that night",
-      "would not return for two hundred years.",
+      "Would not return for two hundred years.",
       "Maybe even more."
     ],
     [
@@ -20,7 +20,7 @@ export const ENDGAME_TEXT = {
     [
       "Bengal has seen its last free dawn.",
       "Hold tight.",
-      "It's going to be a long night."
+      {text: "It's going to be a long night.", red:true }
     ],
   ],
 
@@ -38,12 +38,12 @@ export const ENDGAME_TEXT = {
     [
       "It was a necessary sacrifice.",
       "For Bengal.",
-      "Right...?"
+      { text: "Right...?" red:true }
     ],
     [
       "The naive Nawab is gone.",
-      "Now Bengal will thrive under your rule.",
-      "Right?"
+      "Now Bengal will thrive under { text: your red: true} rule.",
+      { text : "Right?" red; true }
     ],
   ],
 
@@ -51,7 +51,8 @@ export const ENDGAME_TEXT = {
   NAWAB_SEES_NAWAB_WIN: [
     [
       "Bengal breathes tonight.",
-      "The Company never forgets what it wants."
+      "But The Company never forgets "
+      { text: "what it wants.", red: true }
     ],
     [
       "The traitors fall.",
@@ -61,7 +62,7 @@ export const ENDGAME_TEXT = {
     [
       "Bengal survives.",
       "Surely the Nawab will execute the traitors now.",
-      "Right?"
+      { text: "Right?", red:true }
     ],
   ],
 
@@ -71,10 +72,10 @@ export const ENDGAME_TEXT = {
       "The mission failed.",
       "Bengal survives.",
       "Beg for forgiveness.",
-      "For now."
+      { text: "For now.", red;true }
     ],
     [
-      "A lost battle.",
+      "Nothing but a lost battle.",
       "The Company will be back."
     ],
     [
