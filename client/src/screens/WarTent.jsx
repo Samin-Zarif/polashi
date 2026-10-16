@@ -1,13 +1,12 @@
 // POLASHI - War Tent Phase 2 Main Game UI
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useGameStore } from '../store/gameStore';
-import SwordClash from '../components/SwordClash';
-import '../components/SwordClash.css';
-import VoteOverlay from '../components/VoteOverlay';
-import '../components/VoteOverlay.css';
 import BattleCardOverlay from '../components/BattleCardOverlay';
+import BattleUnderway from '../components/BattleUnderway';
 import '../components/BattleCardOverlay.css';
+import SealVote from '../components/SealVote';
 import { startBackgroundMusic } from '../hooks/useBgMusic';
+import { setMusicScene } from '../hooks/useAudioStore';
 import SettingsPanel from '../components/SettingsPanel';
 import '../components/SettingsPanel.css';
 import CinematicText from '../components/CinematicText';
@@ -16,12 +15,24 @@ import { AssetImage } from '../components/AssetImage';
 import { IMAGES, SOUNDS } from '../assets/assetManifest';
 import { useSound, playSound } from '../hooks/useSound';
 import { pickVariant, getEndgameKey } from '../data/endgameText';
+import WarTable3D from '../components/WarTable3D';
 import './WarTent.css';
 
 const ROLE_ICONS = {
-  MIR_MODON:'S', MOHON_LAL:'B', LOYAL_SOLDIER:'L',
-  MIR_JAFAR:'A', GHASETI_BEGUM:'D', RAY_DURLABH:'H',
-  OMICHAND:'O', EIC_CONSPIRATOR:'E',
+  MIR_MODON:       'M',
+  MOHON_LAL:       'B',
+  SIRAJ:           'N',
+  LUTFUNNISA:      'L',
+  ST_FRAIS:        'F',
+  JEAN_LAW:        'J',
+  DE_BUSSY:        'D',
+  MIR_JAFAR:       'A',
+  GHASETI_BEGUM:   'G',
+  RAY_DURLABH:     'R',
+  OMICHAND:        'O',
+  RAY_DURLABH_PLAIN: 'R',
+  OMICHAND_PLAIN:    'O',
+  JAGAT_SETH:        'J',
 };
 const CHAPTER_ICONS = ['I','II','III','IV','V'];
 const TEAM_SIZES = {
@@ -36,7 +47,7 @@ function PhaseBanner({ phase, leaderName, teamSize, rejectionCount, isLeader }) 
   if (phase==='TEAM_PROPOSAL') desc = isLeader ? `Choose ${teamSize} commanders for this chapter.` : `${leaderName} is choosing ${teamSize} commanders.`;
   if (phase==='TEAM_VOTE')     desc = 'All commanders must vote on the proposed team.';
   if (phase==='MISSION_CLASH') desc = 'Approved commanders — submit your action card.';
-  if (phase==='ROUND_RESULT')  desc = 'The battlefield speaks\u2026';
+  if (phase==='ROUND_RESULT')  desc = 'The battlefield speaks…';
   return (
     <div className="wt-phase-banner">
       <div className="wt-phase-banner__text">
@@ -53,26 +64,25 @@ function PuzzleMap({ chapterScores, currentChapter }) {
   const nawab = chapterScores.filter(s=>s==='NAWAB').length;
   const eic   = chapterScores.filter(s=>s==='EIC').length;
   return (
-    <div className="wt-map">
-      <div className="wt-map__title">Palashi — Battle Map</div>
+    <section className="wt-plaque wt-map">
+      <h2 className="wt-plaque__title">Battle Map</h2>
       <div className="wt-map__pieces">
         {chapterScores.map((score,i) => {
           const isCurrent = (i+1)===currentChapter && !score;
           return (
-            <div key={i} className={`wt-map__piece${score?' '+score.toLowerCase():''}${isCurrent?' current':''}`}>
-              <span className="wt-map__piece-num">Ch.{i+1}</span>
-              <span className="wt-map__piece-icon">
-                {score==='NAWAB'?'\u2705':score==='EIC'?'\u274C':CHAPTER_ICONS[i]}
-              </span>
+            <div key={i} className={`wt-map__piece${score?' '+score.toLowerCase():''}${isCurrent?' current':''}`}
+              title={`Chapter ${i+1}${score==='NAWAB'?': Nawab victory':score==='EIC'?': EIC sabotage':isCurrent?': now':''}`}>
+              <span className="wt-map__piece-num">{CHAPTER_ICONS[i]}</span>
+              <span className="wt-map__piece-icon">{score==='NAWAB'?'✓':score==='EIC'?'✗':''}</span>
             </div>
           );
         })}
       </div>
       <div className="wt-map__score">
-        <span className="wt-map__score-nawab">Nawab: {nawab}</span>
-        <span className="wt-map__score-eic">EIC: {eic}</span>
+        <span className="wt-map__score-nawab">Nawab {nawab}</span>
+        <span className="wt-map__score-eic">EIC {eic}</span>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -81,15 +91,15 @@ function MissionLog({ history }) {
   const logRef = useRef(null);
   useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [history.length]);
   return (
-    <div className="wt-log">
-      <div className="wt-log__title">Battle Log</div>
+    <section className="wt-plaque wt-log">
+      <h2 className="wt-plaque__title">Battle Log</h2>
       <div className="wt-log__entries" ref={logRef}>
         {history.length===0 && <div className="wt-log__empty">No chapters fought yet.</div>}
         {history.map(entry => (
           <div key={entry.id} className={`wt-log__entry${entry.passed?' passed':''}${entry.outcome?' '+entry.outcome.toLowerCase()+'-win':''}`}>
             <div className="wt-log__entry-header">
               <span className="wt-log__chapter-badge">Chapter {entry.chapter}</span>
-              <span className={`wt-log__verdict${entry.passed?' pass':' fail'}`}>{entry.passed?'\u2713 Approved':'\u2717 Rejected'}</span>
+              <span className={`wt-log__verdict${entry.passed?' pass':' fail'}`}>{entry.passed?'Approved':'Rejected'}</span>
             </div>
             <div className="wt-log__line">Leader: <span>{entry.leaderName}</span></div>
             <div className="wt-log__line">Team: <span>{entry.team.join(', ')}</span></div>
@@ -99,114 +109,84 @@ function MissionLog({ history }) {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
-// ── Player Table (round or rectangular based on count) ────────────────────────
-function PlayerTable({ players, myId, myIntel, phase, teamProposal, selectedIds, onToggleSelect, votes, votesRevealed }) {
-  const isProposal = phase === 'TEAM_PROPOSAL';
-  const safeIntel  = { redPlayerIds: myIntel?.redPlayerIds||[], yellowPlayerIds: myIntel?.yellowPlayerIds||[] };
-  const isRound    = players.length < 6;
-
-  const getCirclePos = (i, total) => {
-    const a = (i/total)*2*Math.PI - Math.PI/2;
-    const r = 42;
-    return { left:`${50+r*Math.cos(a)}%`, top:`${50+r*Math.sin(a)}%` };
-  };
-
-  const renderSeat = (p, idx) => {
-    const isMe       = p.id === myId;
-    const isOnTeam   = teamProposal.includes(p.id);
-    const isSelected = (selectedIds||[]).includes(p.id);
-    const isRed      = safeIntel.redPlayerIds.includes(p.id);
-    const isYellow   = safeIntel.yellowPlayerIds.includes(p.id);
-    const selectable = isProposal && !!onToggleSelect;
-    const cls = ['wt-seat',
-      isMe?'is-me':'', p.isLeader?'is-leader':'',
-      isOnTeam?'is-on-team':'', isSelected?'is-selected':'',
-      p.hasVoted?'has-voted':'', selectable?'selectable':'',
-      isRed?'intel-red':isYellow?'intel-yellow':'',
-    ].filter(Boolean).join(' ');
-    const style = isRound ? getCirclePos(idx, players.length) : {};
-    return (
-      <div key={p.id} className={cls} style={style}
-        onClick={() => selectable && onToggleSelect(p.id)}
-        role={selectable?'button':undefined}>
-        {p.isLeader && <div className="wt-seat__leader-token">Leader</div>}
-        <div className="wt-seat__avatar">
-          {p.name.charAt(0).toUpperCase()}
-          {(isOnTeam||isSelected) && <div className="wt-seat__checkmark">✓</div>}
-        </div>
-        <div className="wt-seat__name">{p.name}</div>
-        {isMe && <div className="wt-seat__you-tag">(you)</div>}
-        {p.roleMeta && <div className="wt-seat__you-tag">{p.roleMeta.displayName}</div>}
-        {votesRevealed && votes && votes[p.id] && (
-          <div className="wt-seat__voted-indicator"
-            style={{color:votes[p.id]==='YES'?'var(--nawab-bright)':'var(--eic-bright)'}}>
-            {votes[p.id]==='YES'?'✓ Yes':'✗ No'}
-          </div>
-        )}
-        {phase==='TEAM_VOTE' && !votesRevealed && p.hasVoted && <div className="wt-seat__voted-indicator">Voted</div>}
-      </div>
-    );
-  };
-
-  const rectRows = () => {
-    const topCount = Math.ceil(players.length / 2);
-    const top    = players.slice(0, topCount);
-    const bottom = players.slice(topCount);
-    return (
-      <>
-        <div className="wt-rect-row">{top.map((p,i) => renderSeat(p,i))}</div>
-        <div className="wt-rect-row">{bottom.map((p,i) => renderSeat(p,i+topCount))}</div>
-      </>
-    );
-  };
-
+// ── Intelligence (only for roles that see someone) ────────────────────────────
+function IntelPanel({ myIntel, players }) {
+  const nameOf = id => players.find(p=>p.id===id)?.name;
+  const redNames    = (myIntel?.redPlayerIds||[]).map(nameOf).filter(Boolean);
+  const yellowNames = (myIntel?.yellowPlayerIds||[]).map(nameOf).filter(Boolean);
+  if (!redNames.length && !yellowNames.length) return null;
   return (
-    <div className="wt-table-wrap">
-      <div className="wt-table-title">Commanders at the Table</div>
-      <div className={`wt-table ${isRound ? 'wt-table--round' : 'wt-table--rect'}`}>
-        {isRound ? players.map((p, idx) => renderSeat(p, idx)) : rectRows()}
-        {isRound && <div className="wt-table__center-emblem">⚔</div>}
-      </div>
-    </div>
+    <section className="wt-plaque wt-intel-panel">
+      <h2 className="wt-plaque__title">Your Intelligence</h2>
+      {redNames.map(n => <div key={n} className="wt-intel-panel__item red">{n} — EIC traitor</div>)}
+      {yellowNames.map(n => <div key={n} className="wt-intel-panel__item yellow">{n} — suspect</div>)}
+    </section>
   );
+}
+
+// ── Screen layout ─────────────────────────────────────────────────────────────
+// The room fills the whole screen; the panels float over it. On narrow screens (phones)
+// the room sits on top and the panels follow underneath. The table always stays in the
+// clear space between the panels (the insets handed to the room).
+function useTentLayout() {
+  const [vw, setVw] = useState(() => (typeof window === 'undefined' ? 1280 : window.innerWidth));
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return useMemo(() => {
+    const stacked = vw < 900;
+    const gutter = vw >= 1400 ? 24 : 16;
+    const col = stacked ? 0 : Math.round(Math.min(330, Math.max(232, vw * 0.19)));
+    const header = stacked ? 52 : 60;
+    const dock = 112;
+    const side = col + gutter * 2;
+    return {
+      stacked,
+      vars: { '--wt-gutter': `${gutter}px`, '--wt-col': `${col}px`, '--wt-header': `${header}px` },
+      insets: stacked
+        ? { top: header, right: 8, bottom: 12, left: 8, keepTorches: false }
+        : { top: header, right: side, bottom: dock, left: side, keepTorches: true },
+      // the reveal (the assassination): no side columns, so the room takes the width, and
+      // the assassination panel sits at the bottom.
+      revealInsets: stacked
+        ? { top: header, right: 8, bottom: 12, left: 8, keepTorches: false }
+        : { top: header, right: gutter * 2, bottom: 190, left: gutter * 2, keepTorches: false },
+    };
+  }, [vw]);
+}
+
+// ── Player Table — real 3D scene (Three.js), automatic 2D fallback ──────────
+// Rendered once by WarTent and kept on screen through every phase, so the room
+// never reloads or flashes when the game moves from proposal to vote to clash.
+function PlayerTable(props) {
+  return <WarTable3D {...props} />;
 }
 
 // ── Proposal ──────────────────────────────────────────────────────────────────
-function ProposalActions({ players, myId, gameState, requiredSize }) {
+function ProposalActions({ players, myId, gameState, requiredSize, selected }) {
   const socket = useGameStore(s=>s.socket);
-  const [selected, setSelected] = useState([]);
-  useEffect(() => setSelected([]), [gameState.phase]);
   const leader   = players[gameState.leaderIndex];
   const isLeader = leader?.id === myId;
-  const toggleSelect = id => {
-    if (!isLeader) return;
-    setSelected(prev => prev.includes(id) ? prev.filter(x=>x!==id) : prev.length<requiredSize ? [...prev,id] : prev);
-  };
   const handlePropose = () => { if (selected.length===requiredSize) socket.emit('propose_team',{teamIds:selected}); };
 
   if (!isLeader) return (
-    <>
-      <PlayerTable players={players} myId={myId} myIntel={gameState.myIntel} phase={gameState.phase}
-        teamProposal={gameState.teamProposal} selectedIds={[]} votes={null} votesRevealed={false} />
-      <div className="wt-action">
-        <p className="wt-vote__waiting animate-flicker">Waiting for {leader?.name} to choose the team&hellip;</p>
-      </div>
-    </>
+    <div className="wt-action">
+      <p className="wt-vote__waiting animate-flicker">Waiting for {leader?.name} to choose the team&hellip;</p>
+    </div>
   );
   return (
     <>
-      <PlayerTable players={players} myId={myId} myIntel={gameState.myIntel} phase={gameState.phase}
-        teamProposal={gameState.teamProposal} selectedIds={selected} onToggleSelect={toggleSelect}
-        votes={null} votesRevealed={false} />
       <div className="wt-action">
         <div className="wt-propose">
           <span className="wt-propose__count">Selected: <strong>{selected.length} / {requiredSize}</strong></span>
           <button className="btn btn-primary" onClick={handlePropose} disabled={selected.length!==requiredSize}>
-            \u2694 Propose Team
+            ⚔ Propose Team
           </button>
         </div>
       </div>
@@ -215,10 +195,15 @@ function ProposalActions({ players, myId, gameState, requiredSize }) {
 }
 
 // ── Vote ──────────────────────────────────────────────────────────────────────
-function VoteActions({ players, myId, gameState }) {
+// The proposed team arrives as a letter; the player seals it with the green seal (approve)
+// or the red one (reject). The vote is sent when the seal strikes the letter.
+const MAX_PROPOSALS = 5;   // the server's MAX_REJECTION_COUNT: the fifth refusal hands the game to the Company
+function VoteActions({ players, myId, gameState, insets, stacked }) {
   const socket = useGameStore(s=>s.socket);
   const [myVote, setMyVote] = useState(null);
-  const { teamProposal, votes, votesRevealed, phase } = gameState;
+  const [sealDone, setSealDone] = useState(false);   // the letter has finished its sealing and gone
+  const [peek, setPeek] = useState(false);           // the letter is put aside to look at the table
+  const { teamProposal, votes, votesRevealed, leaderIndex, chapter, rejectionCount } = gameState;
   const me = players.find(p=>p.id===myId);
   const castVote = v => {
     if (me?.hasVoted||myVote) return;
@@ -226,6 +211,13 @@ function VoteActions({ players, myId, gameState }) {
     socket.emit('cast_vote',{vote:v});
     playSound(v==='YES'?SOUNDS.VOTE_YES:SOUNDS.VOTE_NO);
   };
+  const letter = useMemo(() => ({
+    leaderName: players[leaderIndex]?.name || '?',
+    teamNames: (teamProposal||[]).map(id => players.find(p=>p.id===id)?.name || '?'),
+    chapter, proposalNo: (rejectionCount||0) + 1, maxProposals: MAX_PROPOSALS,
+  }), [players, leaderIndex, teamProposal, chapter, rejectionCount]);
+  // open until I have voted; once I seal it here, it stays until its own animation is over
+  const showSeal = myVote ? !sealDone : (!me?.hasVoted && !votesRevealed);
   useEffect(() => {
     if (votesRevealed && votes) {
       const y = Object.values(votes).filter(v=>v==='YES').length;
@@ -237,23 +229,21 @@ function VoteActions({ players, myId, gameState }) {
   const noCount  = votes?Object.values(votes).filter(v=>v==='NO').length:0;
   return (
     <>
-      <PlayerTable players={players} myId={myId} myIntel={gameState.myIntel} phase={phase}
-        teamProposal={teamProposal} selectedIds={[]} votes={votes} votesRevealed={votesRevealed} />
       <div className="wt-action">
         {votesRevealed ? (
           <div className="wt-vote-results">
             <div className={`wt-vote-results__verdict${yesCount>noCount?' pass':' fail'}`}>
-              {yesCount>noCount?'\u2694 Team Approved':'\u2717 Team Rejected'}
+              {yesCount>noCount?'⚔ Team Approved':'✗ Team Rejected'}
             </div>
             <div className="wt-vote-results__breakdown">
-              <span className="wt-vote-results__yes">\u2713 Yes: {yesCount}</span>
-              <span className="wt-vote-results__no">\u2717 No: {noCount}</span>
+              <span className="wt-vote-results__yes">✓ Yes: {yesCount}</span>
+              <span className="wt-vote-results__no">✗ No: {noCount}</span>
             </div>
             {votes && (
               <div className="wt-vote-tally">
                 {Object.entries(votes).map(([id,v]) => {
                   const name = players.find(p=>p.id===id)?.name||'?';
-                  return <div key={id} className={`wt-vote-tally__item ${v.toLowerCase()}`}>{v==='YES'?'\u2713':'\u2717'} {name}</div>;
+                  return <div key={id} className={`wt-vote-tally__item ${v.toLowerCase()}`}>{v==='YES'?'✓':'✗'} {name}</div>;
                 })}
               </div>
             )}
@@ -262,25 +252,20 @@ function VoteActions({ players, myId, gameState }) {
           <p className="wt-vote__waiting animate-flicker">
             Vote cast — waiting for others&hellip; ({players.filter(p=>p.hasVoted).length} / {players.length})
           </p>
-        ) : (
-          <div className="wt-vote">
-            <button className={`wt-vote__btn yes${myVote==='YES'?' selected':''}`} onClick={()=>castVote('YES')} disabled={!!myVote}>
-              <span className="wt-vote__btn-icon">\u2713</span>
-              <span className="wt-vote__btn-label">Loyal to the Nawab</span>
-            </button>
-            <button className={`wt-vote__btn no${myVote==='NO'?' selected':''}`} onClick={()=>castVote('NO')} disabled={!!myVote}>
-              <span className="wt-vote__btn-icon">\u2717</span>
-              <span className="wt-vote__btn-label">Reject the Team</span>
-            </button>
-          </div>
-        )}
+        ) : peek ? (
+          <button className="btn btn-primary wt-vote__return" onClick={()=>setPeek(false)}>Return to the letter</button>
+        ) : null}
       </div>
+      {showSeal && (
+        <SealVote letter={letter} onVote={castVote} onClosed={()=>setSealDone(true)}
+          insets={insets} stacked={stacked} hidden={peek} onPeek={()=>setPeek(true)} />
+      )}
     </>
   );
 }
 
 // ── Mission Clash ─────────────────────────────────────────────────────────────
-function MissionClashActions({ players, myId, gameState }) {
+function MissionClashActions({ players, myId, gameState, needsTwo }) {
   const socket = useGameStore(s=>s.socket);
   const [card, setCard] = useState(null);
   const { teamProposal, myRoleInfo } = gameState;
@@ -292,21 +277,24 @@ function MissionClashActions({ players, myId, gameState }) {
   const waiting   = teamProposal.length - players.filter(p=>teamProposal.includes(p.id)&&p.missionCardSubmitted).length;
   return (
     <>
-      <PlayerTable players={players} myId={myId} myIntel={gameState.myIntel} phase="MISSION_CLASH"
-        teamProposal={teamProposal} selectedIds={[]} votes={null} votesRevealed={false} />
       <div className="wt-action">
         {!isOnTeam ? (
-          <SwordClash waiting={waiting} />
+          <p className="wt-mission__waiting animate-flicker">
+            Battle underway &mdash; {waiting} card{waiting !== 1 ? 's' : ''} remaining
+          </p>
         ) : submitted || card ? (
           <p className="wt-mission__waiting animate-flicker">Card submitted — waiting&hellip; ({waiting} remaining)</p>
-        ) : (
-          <BattleCardOverlay
-            isEIC={isEIC}
-            onSubmit={submitCard}
-            submitted={submitted || !!card}
-          />
-        )}
+        ) : null}
       </div>
+      {/* Battle card overlay — full screen, outside action bar */}
+      {isOnTeam && !submitted && !card && (
+        <BattleCardOverlay
+          isEIC={isEIC}
+          onSubmit={submitCard}
+          submitted={submitted || !!card}
+          needsTwo={needsTwo}
+        />
+      )}
     </>
   );
 }
@@ -321,8 +309,6 @@ function RoundResultView({ gameState, players, myId }) {
   const { betrayalCount, nawabWon } = missionResults;
   return (
     <>
-      <PlayerTable players={players} myId={myId} myIntel={gameState.myIntel} phase="ROUND_RESULT"
-        teamProposal={teamProposal} selectedIds={[]} votes={null} votesRevealed={false} />
       <div className="wt-action">
         <div className="wt-result">
           <div className={`wt-result__verdict${nawabWon?' nawab':' eic'}`}>
@@ -337,54 +323,50 @@ function RoundResultView({ gameState, players, myId }) {
   );
 }
 
-// ── Assassination ─────────────────────────────────────────────────────────────
-function AssassinationPhase({ gameState }) {
-  const socket = useGameStore(s=>s.socket);
-  const myId   = useGameStore(s=>s.myId);
+// ── The reveal: the room stays on screen ─────────────────────────────────────
+// Assassination: the traitors stand revealed (red statues, their characters under their
+// names) and Mir Jafar marks his target by clicking a statue of the Nawab's side.
+function AssassinationPanel({ gameState, mark, onStrike }) {
   const { players, myRoleInfo } = gameState;
-  const [selected, setSelected] = useState(null);
-  useEffect(() => { playSound(SOUNDS.ASSASSINATION,{volume:0.8}); }, []);
-  const isAssassin = myRoleInfo?.role==='MIR_JAFAR';
-  const targets    = players.filter(p=>p.id!==myId);
+  const isAssassin = myRoleInfo?.role === 'MIR_JAFAR';
+  const markName = players.find(p => p.id === mark)?.name;
+  useEffect(() => { playSound(SOUNDS.ASSASSINATION, { volume: 0.8 }); }, []);
+  const line = isAssassin ? 'Three chapters lost. One knife left. Find Mir Modon.'
+    : myRoleInfo?.faction === 'EIC' ? 'Your masks are off. Mir Jafar is hunting now. Wait for him.'
+    : myRoleInfo?.role === 'MIR_MODON' ? 'Hold your breath. They are hunting you.'
+    : 'The traitors stand revealed. Now they hunt Mir Modon.';
   return (
-    <div className="assassination">
-      <p className="assassination__eyebrow">The Final Move</p>
-      <h1 className="assassination__title">The Assassination</h1>
-      <p className="assassination__desc">
-        {isAssassin
-          ? "The Nawab has won 3 chapters — but you have one last chance. Find Mir Modon and history changes forever."
-          : "The EIC traitors are conferring. Mir Jafar is about to make his move. Stay calm."}
-      </p>
+    <div className="wt-action wt-reveal">
+      <h2 className="wt-reveal__title">The Assassination</h2>
+      <p className="wt-reveal__line">{line}</p>
       {isAssassin ? (
-        <>
-          <div className="assassination__targets">
-            {targets.map(p => (
-              <div key={p.id} className={`assassination__target${selected===p.id?' selected':''}`} onClick={()=>setSelected(p.id)}>
-                <div className="assassination__target-avatar">{p.name.charAt(0).toUpperCase()}</div>
-                {p.name}
-              </div>
-            ))}
-          </div>
-          <button className="btn btn-danger" onClick={()=>selected&&socket.emit('assassinate',{targetId:selected})}
-            disabled={!selected} style={{padding:'16px 56px',fontSize:'1.05rem',letterSpacing:'0.15em'}}>
-            Assassinate
-          </button>
-        </>
+        <div className="wt-reveal__strike">
+          <span className="wt-reveal__mark">
+            {markName ? <>Your mark: <strong>{markName}</strong></> : 'Click a statue to mark your target.'}
+          </span>
+          <button className="btn btn-danger" disabled={!mark} onClick={onStrike}>Strike</button>
+        </div>
       ) : (
-        <p className="assassination__waiting animate-flicker">Mir Jafar is choosing their target&hellip;</p>
+        <p className="wt-reveal__waiting animate-flicker">Mir Jafar is choosing&hellip;</p>
       )}
     </div>
   );
 }
 
 // ── Game Over ─────────────────────────────────────────────────────────────────
+// Full screen, as it was before 15 Oct (Zarif's choice): your team's name, Victory or Defeat,
+// his closing lines, every player's role, Play Again. Victory is always green and Defeat always
+// red (the background tint too), whichever team you were on.
 function GameOverScreen({ gameState }) {
-  const myId = useGameStore(s=>s.myId);
   const { winner, players } = gameState;
   // faction comes from myRoleInfo (always present), not public player list (faction stripped)
   const myFaction = gameState.myRoleInfo?.faction;
   const iWon = (winner === 'NAWAB' && myFaction === 'NAWAB') || (winner === 'EIC' && myFaction === 'EIC');
-  const isNawab = winner==='NAWAB'; // used for colour/theme only
+  const isNawab = winner==='NAWAB';                       // which side won (for the sound)
+  // the word above Victory / Defeat is always the player's own team (in its colour)
+  const mine = (myFaction || winner) === 'EIC' ? 'eic' : 'nawab';
+  // the result's colour, whatever the team (Zarif's rule): Victory is green, Defeat is red
+  const tone = iWon ? 'nawab' : 'eic';
 
   // Pick cinematic text once on mount
   const segments = useMemo(() => {
@@ -397,14 +379,14 @@ function GameOverScreen({ gameState }) {
   }, []);
 
   return (
-    <div className={`game-over${isNawab?' nawab':' eic'}`}>
-      {/* Faction label */}
-      <p className={`game-over__faction${isNawab?' nawab':' eic'}`}>
-        {isNawab?'Nawab Pokkho':'EIC Pokkho'}
+    <div className={`game-over ${tone}`}>
+      {/* Your team */}
+      <p className={`game-over__faction ${mine}`}>
+        {mine==='nawab'?'Nawab':'EIC'}
       </p>
 
-      {/* Big title */}
-      <h1 className={`game-over__title${isNawab?' nawab':' eic'}`}>
+      {/* Big title: your team's result */}
+      <h1 className={`game-over__title ${tone}`}>
         {iWon?'Victory':'Defeat'}
       </h1>
 
@@ -438,7 +420,9 @@ function GameOverScreen({ gameState }) {
 // ── Main WarTent ──────────────────────────────────────────────────────────────
 export default function WarTent({ gameState }) {
   const myId = useGameStore(s=>s.myId);
+  const socket = useGameStore(s=>s.socket);
   const [showSettings, setShowSettings] = useState(false);
+  const layout = useTentLayout();
   const { phase, chapter, leaderIndex, rejectionCount, chapterScores,
           missionHistory, players, teamProposal, myRoleInfo, myIntel,
           votes, votesRevealed } = gameState;
@@ -446,69 +430,129 @@ export default function WarTent({ gameState }) {
   const isLeader    = leader?.id === myId;
   const requiredSize = TEAM_SIZES[players.length]?.[chapter]||2;
 
-  if (phase==='ASSASSINATION') return <AssassinationPhase gameState={gameState} />;
-  if (phase==='GAME_OVER')     return <GameOverScreen gameState={gameState} />;
+  // The music drops to a quiet 5% once the war tent opens (unless the player set the level)
+  useEffect(() => { setMusicScene('quiet'); return () => setMusicScene('full'); }, []);
+
+  // The leader's picks while proposing a team. Kept here (not in ProposalActions) so the
+  // table can stay mounted through every phase. They belong to one proposal, so a new
+  // proposal (new phase, leader or chapter) starts with nobody picked.
+  const proposalKey = `${phase}|${leaderIndex}|${chapter}`;
+  const [picks, setPicks] = useState({ key: proposalKey, ids: [] });
+  const selected = picks.key === proposalKey ? picks.ids : [];
+  const proposing = phase==='TEAM_PROPOSAL' && isLeader;
+  const toggleSelect = id => {
+    if (!proposing) return;
+    setPicks(prev => {
+      const cur = prev.key === proposalKey ? prev.ids : [];
+      const ids = cur.includes(id) ? cur.filter(x=>x!==id) : cur.length<requiredSize ? [...cur,id] : cur;
+      return { key: proposalKey, ids };
+    });
+  };
+
+  // ── The reveal (the assassination): the room stays, the traitors light up red ──
+  const reveal = phase === 'ASSASSINATION';
+  const isAssassin = phase === 'ASSASSINATION' && myRoleInfo?.role === 'MIR_JAFAR';
+  const [mark, setMark] = useState(null);                  // Mir Jafar's chosen target
+  const markable = isAssassin ? players.filter(p => p.id !== myId && p.faction !== 'EIC').map(p => p.id) : [];
+  const toggleMark = id => { if (markable.includes(id)) setMark(m => (m === id ? null : id)); };
+  const strike = () => { if (mark) socket.emit('assassinate', { targetId: mark }); };
+  const revealedEic = players.filter(p => p.faction === 'EIC').map(p => p.id);
+  const shownIntel = reveal ? {
+    redPlayerIds: [...new Set([...(myIntel?.redPlayerIds || []), ...revealedEic])],
+    yellowPlayerIds: (myIntel?.yellowPlayerIds || []).filter(id => !revealedEic.includes(id)),
+  } : myIntel;
+
+  // ── The battle underway (the rain at Palashi): full screen for whoever is waiting while the
+  // team plays its cards. When the last card is in, the field falls silent for a breath (the
+  // overlay stays in its ending), and only then does the result appear.
+  const team = teamProposal || [];
+  const me = players.find(p => p.id === myId);
+  const played = players.filter(p => team.includes(p.id) && p.missionCardSubmitted).length;
+  const waitingInClash = phase === 'MISSION_CLASH' && (!team.includes(myId) || !!me?.missionCardSubmitted);
+  // (worked out during the render, so the overlay never disappears for a frame in between)
+  const [battleEnding, setBattleEnding] = useState(false);
+  const [lastPhase, setLastPhase] = useState(phase);
+  if (lastPhase !== phase) {
+    setLastPhase(phase);
+    if (lastPhase === 'MISSION_CLASH' && phase === 'ROUND_RESULT') setBattleEnding(true);
+  }
+  useEffect(() => {
+    if (!battleEnding) return undefined;
+    const t = setTimeout(() => setBattleEnding(false), 1900);
+    return () => clearTimeout(t);
+  }, [battleEnding]);
+
+  // Chapter 4 with 7 or more players needs two Betray cards to fall (the server's
+  // REQUIRES_TWO_BETRAYALS): a small notice for everyone when the chapter begins.
+  const needsTwo = players.length >= 7 && chapter === 4;
+  const [ch4Seen, setCh4Seen] = useState(false);
+  const showCh4 = needsTwo && phase === 'TEAM_PROPOSAL' && !ch4Seen;
+  useEffect(() => {
+    if (!showCh4) return undefined;
+    const t = setTimeout(() => setCh4Seen(true), 7000);
+    return () => clearTimeout(t);
+  }, [showCh4]);
+
+  // The end has its own full screen (after every hook above, so the hooks always run in the same order)
+  if (phase==='GAME_OVER') return <GameOverScreen gameState={gameState} />;
 
   const renderMain = () => {
-    if (phase==='TEAM_PROPOSAL') return <ProposalActions players={players} myId={myId} gameState={gameState} requiredSize={requiredSize} />;
-    if (phase==='TEAM_VOTE')     return <VoteActions players={players} myId={myId} gameState={gameState} />;
-    if (phase==='MISSION_CLASH') return <MissionClashActions players={players} myId={myId} gameState={gameState} />;
-    if (phase==='ROUND_RESULT')  return <RoundResultView gameState={gameState} players={players} myId={myId} />;
+    if (phase==='ASSASSINATION') return <AssassinationPanel gameState={gameState} mark={mark} onStrike={strike} />;
+    if (phase==='TEAM_PROPOSAL') return <ProposalActions players={players} myId={myId} gameState={gameState} requiredSize={requiredSize} selected={selected} />;
+    if (phase==='TEAM_VOTE')     return <VoteActions players={players} myId={myId} gameState={gameState} insets={layout.insets} stacked={layout.stacked} />;
+    if (phase==='MISSION_CLASH') return <MissionClashActions players={players} myId={myId} gameState={gameState} needsTwo={needsTwo} />;
+    if (phase==='ROUND_RESULT')  return battleEnding ? null : <RoundResultView gameState={gameState} players={players} myId={myId} />;
     return null;
   };
 
   return (
-    <div className="war-tent">
+    <div className={`war-tent${layout.stacked ? ' war-tent--stacked' : ''}${reveal ? ' war-tent--reveal' : ''}`} style={layout.vars}>
+      {/* the painted room fills the screen; everything else floats over it */}
+      <div className="wt-stage">
+        <PlayerTable players={players} myId={myId} myIntel={shownIntel} phase={phase}
+          teamProposal={reveal ? [] : (teamProposal || [])}
+          selectedIds={proposing ? selected : isAssassin && mark ? [mark] : []}
+          onToggleSelect={proposing ? toggleSelect : isAssassin ? toggleMark : undefined}
+          selectableIds={isAssassin ? markable : undefined}
+          votes={phase==='TEAM_VOTE' ? votes : null}
+          votesRevealed={phase==='TEAM_VOTE' ? !!votesRevealed : false}
+          insets={reveal ? layout.revealInsets : layout.insets} />
+      </div>
+
       <header className="wt-header">
-        <span className="wt-header__brand">\u2694 Polashi</span>
-        <div className="wt-header__chapter">
+        <span className="wt-header__brand"><span className="wt-header__swords">&#9876;</span> Polashi</span>
+        <div className="wt-header__chapter" aria-label={`Chapter ${chapter} of 5`}>
           <span className="wt-header__chapter-label">Chapter</span>
-          <span className="wt-header__chapter-value">{chapter} / 5</span>
+          <span className="wt-header__chapter-value">{CHAPTER_ICONS[chapter-1] || chapter}</span>
+          <span className="wt-header__chapter-of">of V</span>
         </div>
-        {myRoleInfo && (
-          <div className="wt-header__role-pin">
-            <span className="wt-header__role-icon">{ROLE_ICONS[myRoleInfo.role]||'?'}</span>
-            <div className="wt-header__role-text">
-              <span className="wt-header__role-name">{myRoleInfo.roleMeta.displayName}</span>
-              <span className={`wt-header__role-faction${myRoleInfo.faction==='NAWAB'?' nawab':' eic'}`}>
-                {myRoleInfo.faction==='NAWAB'?'Nawab Pokkho':'EIC Pokkho'}
-              </span>
-            </div>
-          </div>
-        )}
-        <button className="settings-btn" onClick={()=>setShowSettings(true)} title="Audio Settings">&#9881;</button>
+        <button className="settings-btn wt-header__settings" onClick={()=>setShowSettings(true)} title="Audio Settings">&#9881;</button>
       </header>
       {showSettings && <SettingsPanel onClose={()=>setShowSettings(false)} />}
-      <main className="wt-main">{renderMain()}</main>
-      <aside className="wt-sidebar">
-        {myRoleInfo && (() => {
-          const { role, faction, roleMeta } = myRoleInfo;
-          const isNawabRole = faction === 'NAWAB';
-          const redNames    = myIntel?.redPlayerIds?.map(id => players.find(p=>p.id===id)?.name).filter(Boolean)||[];
-          const yellowNames = myIntel?.yellowPlayerIds?.map(id => players.find(p=>p.id===id)?.name).filter(Boolean)||[];
-          return (
-            <div className="wt-my-role-card">
-              <p className="wt-my-role-card__eyebrow">Your Role</p>
-              <div className={`wt-my-role-card__faction ${isNawabRole?'nawab':'eic'}`}>
-                {isNawabRole ? 'Nawab Pokkho' : 'EIC Pokkho'}
-              </div>
-              <div className="wt-my-role-card__icon">{ROLE_ICONS[role]||'?'}</div>
-              <h3 className="wt-my-role-card__name">{roleMeta.displayName}</h3>
-              <p className="wt-my-role-card__title">{roleMeta.title}</p>
-              <p className="wt-my-role-card__desc">{roleMeta.description}</p>
-              {(redNames.length > 0 || yellowNames.length > 0) && (
-                <div className="wt-my-role-card__intel">
-                  <p className="wt-my-role-card__intel-title">Your Intelligence</p>
-                  {redNames.map(n => <div key={n} className="wt-my-role-card__intel-item red">• {n} — EIC Traitor</div>)}
-                  {yellowNames.map(n => <div key={n} className="wt-my-role-card__intel-item yellow">◐ {n} — Suspect</div>)}
-                </div>
-              )}
-            </div>
-          );
-        })()}
-        <PuzzleMap chapterScores={chapterScores} currentChapter={chapter} />
-        <MissionLog history={missionHistory} />
-      </aside>
+      {showCh4 && (
+        <button type="button" className="wt-notice" onClick={() => setCh4Seen(true)} aria-live="polite">
+          <span className="wt-notice__title">Chapter IV</span>
+          <span className="wt-notice__text">One Betray card is not enough this time. It takes two.</span>
+        </button>
+      )}
+      {(waitingInClash || battleEnding) && (
+        <BattleUnderway played={battleEnding ? team.length : played} total={team.length} ending={battleEnding} needsTwo={needsTwo} />
+      )}
+
+      <div className="wt-dock">{renderMain()}</div>
+
+      {!reveal && (
+        <aside className="wt-col wt-col--left">
+          <PuzzleMap chapterScores={chapterScores} currentChapter={chapter} />
+          <MissionLog history={missionHistory} />
+        </aside>
+      )}
+      {!reveal && (
+        <aside className="wt-col wt-col--right">
+          {/* Intel only — no role card, player can see their role on the role reveal screen */}
+          <IntelPanel myIntel={myIntel} players={players} />
+        </aside>
+      )}
     </div>
   );
 }

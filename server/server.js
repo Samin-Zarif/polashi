@@ -56,6 +56,12 @@ function emitError(socket, message) {
   socket.emit('error_msg', { message });
 }
 
+// The three statues a player can sit as: turban and beard, bare head, the queen (cosmetic only)
+const LOOKS = ['A', 'B', 'W'];
+function randomLook() {
+  return LOOKS[Math.floor(Math.random() * LOOKS.length)];
+}
+
 // ─── Socket.IO Event Handlers ─────────────────────────────────────────────────
 
 io.on('connection', (socket) => {
@@ -70,6 +76,7 @@ io.on('connection', (socket) => {
       id:       nanoid(),
       socketId: socket.id,
       name:     playerName.trim(),
+      look:     randomLook(),   // their statue at the war table; they can change it in the lobby
     };
 
     const room = createRoom(roomId, player);
@@ -95,6 +102,7 @@ io.on('connection', (socket) => {
       id:       nanoid(),
       socketId: socket.id,
       name:     playerName.trim(),
+      look:     randomLook(),
     };
 
     const updated = addPlayerToRoom(roomId.toUpperCase(), player);
@@ -116,7 +124,22 @@ io.on('connection', (socket) => {
     if (!room) return;
     if (room.hostId !== playerId) return emitError(socket, 'Only the host can change roles.');
 
-    setEnabledRoles(roomId, roles || []);
+    // only the four optional characters, and Mohon Lal only together with Ghaseti Begum
+    const optional = [ROLES.MOHON_LAL, ROLES.GHASETI_BEGUM, ROLES.RAY_DURLABH, ROLES.OMICHAND];
+    let clean = [...new Set(Array.isArray(roles) ? roles : [])].filter(r => optional.includes(r));
+    if (!clean.includes(ROLES.GHASETI_BEGUM)) clean = clean.filter(r => r !== ROLES.MOHON_LAL);
+    setEnabledRoles(roomId, clean);
+    broadcastLobbyState(room);
+  });
+
+  // ── CHOOSE YOUR STATUE (lobby only, cosmetic) ─────────────────────────────
+  socket.on('set_look', ({ look } = {}) => {
+    const { roomId, playerId } = socket.data;
+    const room = getRoom(roomId);
+    if (!room || room.phase !== PHASES.LOBBY || !LOOKS.includes(look)) return;
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) return;
+    player.look = look;
     broadcastLobbyState(room);
   });
 
@@ -167,7 +190,7 @@ io.on('connection', (socket) => {
           r.phase = PHASES.TEAM_PROPOSAL;
           broadcastGameState(r);
         }
-      }, 8000); // 8 seconds for the night phase reveal
+      }, 12000); // 12 seconds for the night phase (time to read the EIC lineup too)
     } else {
       broadcastGameState(room);
     }
@@ -259,6 +282,8 @@ io.on('connection', (socket) => {
 
     const target = room.players.find(p => p.id === targetId);
     if (!target) return emitError(socket, 'Invalid target.');
+    // the traitors stand revealed by now, so the choice is among the Nawab's side
+    if (target.faction === FACTIONS.EIC) return emitError(socket, "Choose one of the Nawab's side.");
 
     room.assassinationTarget = targetId;
     if (target.role === ROLES.MIR_MODON) {

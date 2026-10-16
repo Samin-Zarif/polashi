@@ -1,0 +1,82 @@
+/* POLASHI — Loading Screen */
+
+.loadscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--ink-black);
+}
+
+/* Ken Burns — image (if provided) slowly zooms and drifts, forever */
+.loadscreen__bg {
+  position: absolute;
+  inset: -6%;
+  background-size: cover;
+  background-position: center;
+  background-color: #14100a;
+  animation: kenburns 22s ease-in-out infinite alternate;
+  filter: saturate(0.9) brightness(0.8);
+}
+@keyframes kenburns {
+  0%   { transform: scale(1)    translate(0, 0); }
+  100% { transform: scale(1.12) translate(1.5%, -1.5%); }
+}
+
+.loadscreen__tint {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 34%, rgba(201,145,58,0.10) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(8,6,3,0.55) 0%, rgba(8,6,3,0.85) 100%);
+}
+.loadscreen__vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 46%, rgba(0,0,0,0.82) 100%);
+  pointer-events: none;
+}
+
+.loadscreen__center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  animation: fadeIn 0.8s ease both;
+}
+
+.loadscreen__seal { width: 116px; height: 116px; filter: drop-shadow(0 0 22px rgba(201,145,58,0.35)); }
+.loadscreen__seal svg { width: 100%; height: 100%; }
+.loadscreen__ring { transform-origin: 60px 60px; }
+.loadscreen__ring--outer { animation: seal-spin 7s linear infinite; }
+.loadscreen__ring--inner { animation: seal-spin 5s linear infinite reverse; }
+@keyframes seal-spin { to { transform: rotate(360deg); } }
+
+.loadscreen__title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(201,145,58,0.4);
+}
+.loadscreen__label {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.loadscreen__dots::after {
+  content: '';
+  animation: load-dots 1.6s steps(4, end) infinite;
+}
+@keyframes load-dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+}

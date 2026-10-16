@@ -1,6 +1,12 @@
-/* POLASHI — Battle Card Overlay */
+/* POLASHI — Battle Card Overlay: lacquered cards with a gold frame, in the war room's style */
 
 .bc-overlay {
+  --ink: 10, 11, 12;
+  --text: #e8e1d2;
+  --muted: #9c9688;
+  --gold: #c4a56a;
+  --gold-hi: #e2c98f;
+  --line: rgba(232, 225, 210, 0.16);
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -19,131 +25,201 @@
 .bc-overlay__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(5,4,3,0.78);
-  backdrop-filter: blur(5px);
+  background: radial-gradient(ellipse at 50% 45%, rgba(var(--ink), 0.78) 0%, rgba(var(--ink), 0.9) 70%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
-/* ── Panel ─────────────────────────────────────────────────────────────────── */
+/* ── Heading, all on one centre line ── */
 .bc-overlay__panel {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-lg);
-  padding: 40px 48px;
-  animation: scaleIn 0.4s var(--ease-cinematic) both;
+  text-align: center;
+  padding: 40px 24px;
+  max-height: 100vh;
+  overflow-y: auto;
+  animation: bc-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-.bc-overlay__eyebrow { font-family:var(--font-heading); font-size:0.7rem; letter-spacing:0.4em; text-transform:uppercase; color:var(--gold-dim); }
-.bc-overlay__title   { font-family:var(--font-display); font-size:clamp(1.6rem,3vw,2.2rem); color:var(--parchment-light); }
-.bc-overlay__sub     { font-family:var(--font-body); font-size:0.85rem; color:var(--text-dim); font-style:italic; }
+.bc-overlay__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 14px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.bc-overlay__eyebrow::before,
+.bc-overlay__eyebrow::after { content: ''; width: 46px; height: 1px; }
+.bc-overlay__eyebrow::before { background: linear-gradient(90deg, transparent, var(--gold)); }
+.bc-overlay__eyebrow::after  { background: linear-gradient(90deg, var(--gold), transparent); }
+.bc-overlay__title {
+  margin: 0 0 10px;
+  font-family: var(--font-heading);       /* plain Cinzel: no joined "OO" */
+  font-variant-ligatures: none;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.bc-overlay__sub {
+  margin: 0 0 34px;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--muted);
+}
 
-/* ── Cards container ───────────────────────────────────────────────────────── */
+/* ── The cards ── */
 .bc-overlay__cards {
   display: flex;
-  gap: 48px;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: stretch;
   justify-content: center;
 }
 
-/* ── Individual Card ───────────────────────────────────────────────────────── */
 .bc-card {
+  --cut: 14px;
+  --edge: var(--gold);
   position: relative;
-  width: 180px;
-  height: 260px;
+  width: 230px;
+  min-height: 286px;
+  padding: 1px;                      /* the 1px gold frame shows round the face */
+  border: 0;
+  background: var(--edge);
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
+                     calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
   cursor: pointer;
-  perspective: 1000px;
-  transition: transform 0.2s var(--ease-cinematic);
+  font: inherit;
+  color: inherit;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease, filter 0.35s ease, background-color 0.2s ease;
 }
-
-.bc-card:hover {
-  transform: translateY(-12px) scale(1.04);
-}
-.bc-card--chosen {
-  transform: translateY(-20px) scale(1.08);
-  pointer-events: none;
-}
-.bc-card--unchosen {
-  opacity: 0.3;
-  transform: scale(0.94);
-  pointer-events: none;
-  filter: blur(1px);
-}
-
-.bc-card__inner {
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.6s var(--ease-cinematic);
-}
-
-.bc-card__front {
-  position: absolute;
-  inset: 0;
+.bc-card:focus { outline: none; }
+.bc-card__face {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-md);
-  padding: var(--space-lg) var(--space-md);
-  border: 2px solid;
-  backface-visibility: hidden;
   text-align: center;
+  height: 100%;
+  min-height: 284px;
+  padding: 26px 14px 28px;
+  clip-path: inherit;
+  overflow: hidden;
 }
-
-/* Corner ornaments on each card */
-.bc-card__front::before,
-.bc-card__front::after {
+/* lacquer: deep green for the Nawab, oxblood for the Company, with a soft light from above */
+.bc-card--loyal .bc-card__face {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(226, 201, 143, 0.14) 0%, transparent 55%),
+    linear-gradient(170deg, #22372b 0%, #142019 100%);
+}
+.bc-card--betrayal .bc-card__face {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(226, 201, 143, 0.12) 0%, transparent 55%),
+    linear-gradient(170deg, #3a1714 0%, #1f0d0b 100%);
+}
+/* a fine inner gold rule */
+.bc-card__face::before {
   content: '';
   position: absolute;
-  width: 18px;
-  height: 18px;
-  border-style: solid;
-}
-
-.bc-card--loyal .bc-card__front {
-  background: linear-gradient(160deg, rgba(20,48,26,0.95) 0%, rgba(10,22,14,0.98) 100%);
-  border-color: var(--nawab-green);
-}
-.bc-card--loyal .bc-card__front::before { top:8px; left:8px;  border-width:1px 0 0 1px; border-color:var(--nawab-green); }
-.bc-card--loyal .bc-card__front::after  { bottom:8px; right:8px; border-width:0 1px 1px 0; border-color:var(--nawab-green); }
-
-.bc-card--betrayal .bc-card__front {
-  background: linear-gradient(160deg, rgba(50,12,12,0.95) 0%, rgba(22,8,8,0.98) 100%);
-  border-color: var(--blood);
-}
-.bc-card--betrayal .bc-card__front::before { top:8px; left:8px;  border-width:1px 0 0 1px; border-color:var(--blood); }
-.bc-card--betrayal .bc-card__front::after  { bottom:8px; right:8px; border-width:0 1px 1px 0; border-color:var(--blood); }
-
-/* Hover glow that expands behind the card */
-.bc-card__hover-glow {
-  position: absolute;
-  inset: -20px;
-  border-radius: 4px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  inset: 8px;
+  border: 1px solid rgba(196, 165, 106, 0.35);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
   pointer-events: none;
-  z-index: -1;
-}
-.bc-card:hover .bc-card__hover-glow { opacity: 1; }
-.bc-card__hover-glow--loyal    { background: radial-gradient(ellipse at center, rgba(46,204,113,0.25) 0%, transparent 70%); }
-.bc-card__hover-glow--betrayal { background: radial-gradient(ellipse at center, rgba(231,76,60,0.25) 0%, transparent 70%); }
-
-/* Chosen card flash */
-.bc-card--chosen .bc-card__front {
-  animation: card-chosen 0.5s ease both;
-}
-@keyframes card-chosen {
-  0%   { box-shadow: none; }
-  50%  { box-shadow: 0 0 60px rgba(232,184,75,0.8); }
-  100% { box-shadow: 0 0 20px rgba(232,184,75,0.3); }
 }
 
-/* ── Text inside card ──────────────────────────────────────────────────────── */
-.bc-card__emblem  { width: 80px; height: 80px; }
-.bc-card__emblem svg { width: 100%; height: 100%; }
-.bc-card__name    { font-family:var(--font-display); font-size:1.1rem; letter-spacing:0.05em; }
-.bc-card--loyal    .bc-card__name { color: var(--nawab-bright); }
-.bc-card--betrayal .bc-card__name { color: var(--eic-bright); }
-.bc-card__faction { font-family:var(--font-heading); font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); }
-.bc-card__desc    { font-family:var(--font-body); font-size:0.75rem; color:var(--text-dim); font-style:italic; line-height:1.5; }
+/* the round medallion, like a Ganjifa card */
+.bc-card__medallion {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 124px;
+  height: 124px;
+  margin-bottom: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 100%);
+  box-shadow: 0 0 0 1px var(--gold), 0 0 0 5px rgba(0, 0, 0, 0.25), 0 0 0 6px rgba(196, 165, 106, 0.45);
+  transition: box-shadow 0.25s ease;
+}
+.bc-card__medallion svg { width: 112px; height: 112px; }
+
+.bc-card__name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--text);
+  padding-left: 0.26em;              /* balance the letter spacing so it sits centred */
+}
+.bc-card__faction {
+  margin-top: 8px;
+  padding-left: 0.2em;               /* balance the letter spacing so it sits centred */
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.bc-card--loyal .bc-card__faction    { color: #8fb89f; }
+.bc-card--betrayal .bc-card__faction { color: #d48a7c; }
+
+/* hover: the card lifts towards you and its frame catches the light */
+.bc-card:hover:not(:disabled),
+.bc-card:focus-visible {
+  --edge: var(--gold-hi);
+  transform: translateY(-8px);
+}
+.bc-card:hover:not(:disabled) .bc-card__medallion,
+.bc-card:focus-visible .bc-card__medallion {
+  box-shadow: 0 0 0 1px var(--gold-hi), 0 0 0 5px rgba(0, 0, 0, 0.25), 0 0 0 6px rgba(226, 201, 143, 0.7), 0 0 26px rgba(226, 201, 143, 0.25);
+}
+.bc-card.is-chosen {
+  --edge: var(--gold-hi);
+  transform: translateY(-12px) scale(1.03);
+  animation: bc-chosen 0.6s ease both;
+}
+.bc-card.is-unchosen {
+  opacity: 0.25;
+  transform: scale(0.96);
+  filter: saturate(0.4);
+}
+.bc-card:disabled { cursor: default; }
+
+@keyframes bc-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes bc-chosen {
+  0%   { filter: brightness(1); }
+  40%  { filter: brightness(1.35); }
+  100% { filter: brightness(1.08); }
+}
+
+@media (max-width: 560px) {
+  .bc-overlay__cards { gap: 16px; }
+  .bc-card { width: calc(50vw - 36px); min-height: 240px; --cut: 10px; }
+  .bc-card__face { min-height: 238px; padding: 20px 8px 18px; }
+  .bc-card__faction { font-size: 0.56rem; letter-spacing: 0.14em; }
+  .bc-card__medallion { width: 92px; height: 92px; margin-bottom: 14px; }
+  .bc-card__medallion svg { width: 84px; height: 84px; }
+  .bc-card__name { font-size: 0.95rem; letter-spacing: 0.18em; }
+}
+
+/* chapter 4 with 7 or more players: two Betray cards are needed */
+.bc-overlay__note {
+  margin: -14px 0 22px;
+  font-family: var(--font-body); font-style: italic; font-size: 1rem;
+  color: #e4907f;
+  text-align: center;
+}

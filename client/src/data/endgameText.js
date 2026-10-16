@@ -15,12 +15,12 @@ export const ENDGAME_TEXT = {
     [
       "The candles went out in Murshidabad that night.",
       "No one came",
-      "to relight them."
+      "to light them again."
     ],
     [
       "Bengal has seen its last free dawn.",
       "Hold tight.",
-      {text: "It's going to be a long night.", red:true }
+      { text: "It's going to be a long night.", red: true }
     ],
   ],
 
@@ -38,12 +38,12 @@ export const ENDGAME_TEXT = {
     [
       "It was a necessary sacrifice.",
       "For Bengal.",
-      { text: "Right...?" red:true }
+      { text: "Right...?", red: true }
     ],
     [
       "The naive Nawab is gone.",
-      "Now Bengal will thrive under { text: your red: true} rule.",
-      { text : "Right?" red; true }
+      { text: "Now Bengal will thrive under your rule.", red: true },
+      { text: "Or so you were told.", red: true }
     ],
   ],
 
@@ -51,7 +51,7 @@ export const ENDGAME_TEXT = {
   NAWAB_SEES_NAWAB_WIN: [
     [
       "Bengal breathes tonight.",
-      "But The Company never forgets "
+      "But The Company never forgets",
       { text: "what it wants.", red: true }
     ],
     [
@@ -62,7 +62,7 @@ export const ENDGAME_TEXT = {
     [
       "Bengal survives.",
       "Surely the Nawab will execute the traitors now.",
-      { text: "Right?", red:true }
+      { text: "Won't he?", red: true }
     ],
   ],
 
@@ -72,7 +72,7 @@ export const ENDGAME_TEXT = {
       "The mission failed.",
       "Bengal survives.",
       "Beg for forgiveness.",
-      { text: "For now.", red;true }
+      { text: "For now.", red: true }
     ],
     [
       "Nothing but a lost battle.",
@@ -91,10 +91,9 @@ export function pickVariant(key) {
   return variants[Math.floor(Math.random() * variants.length)];
 }
 
-// Get the right text key for a player
 export function getEndgameKey(winner, myFaction) {
-  if (winner === 'EIC' && myFaction === 'NAWAB') return 'NAWAB_SEES_EIC_WIN';
-  if (winner === 'EIC' && myFaction === 'EIC')   return 'EIC_SEES_EIC_WIN';
+  if (winner === 'EIC'   && myFaction === 'NAWAB') return 'NAWAB_SEES_EIC_WIN';
+  if (winner === 'EIC'   && myFaction === 'EIC')   return 'EIC_SEES_EIC_WIN';
   if (winner === 'NAWAB' && myFaction === 'NAWAB') return 'NAWAB_SEES_NAWAB_WIN';
   if (winner === 'NAWAB' && myFaction === 'EIC')   return 'EIC_SEES_NAWAB_WIN';
   return null;

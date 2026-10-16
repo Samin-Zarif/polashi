@@ -302,6 +302,5 @@ p  { color: var(--text-primary); line-height: 1.7; }
 .w-full      { width: 100%; }
 
 /* ── Reduced motion ───────────────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-}
+/* Animations play for every player, including those whose computer asks for less motion:
+   the card turn, the seals and the flickering light are part of how the game tells its story. */

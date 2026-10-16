@@ -4,6 +4,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ROLE_META } from './constants.js';
+import { eicLineup } from './roleEngine.js';
 
 /**
  * Builds a safe, personalised payload for a specific recipient.
@@ -37,20 +38,25 @@ export function buildClientView(masterState, recipientId) {
   };
 
   // ── Public player list: strip role/faction from everyone ─────────────────
-  const publicPlayers = players.map((p, idx) => ({
-    id:         p.id,
-    name:       p.name,
-    isLeader:   idx === leaderIndex,
-    isOnTeam:   teamProposal ? teamProposal.includes(p.id) : false,
-    isHost:     p.isHost || false,
-    isReady:    p.isReady || false,
-    hasVoted:   p.hasVoted || false,
-    missionCardSubmitted: p.missionCardSubmitted || false,
-    // Only reveal roles during GAME_OVER or ASSASSINATION
-    role:       shouldRevealRoles(phase) ? p.role : undefined,
-    faction:    shouldRevealRoles(phase) ? p.faction : undefined,
-    roleMeta:   shouldRevealRoles(phase) ? ROLE_META[p.role] : undefined,
-  }));
+  // Who is revealed: when the game is over, everyone; during the assassination, only the
+  // EIC (the traitors stand revealed while Mir Jafar hunts Mir Modon among the rest).
+  const publicPlayers = players.map((p, idx) => {
+    const shown = isRevealed(phase, p);
+    return {
+      id:         p.id,
+      name:       p.name,
+      isLeader:   idx === leaderIndex,
+      isOnTeam:   teamProposal ? teamProposal.includes(p.id) : false,
+      isHost:     p.isHost || false,
+      isReady:    p.isReady || false,
+      hasVoted:   p.hasVoted || false,
+      missionCardSubmitted: p.missionCardSubmitted || false,
+      look:       p.look,       // the statue they chose in the lobby (cosmetic only)
+      role:       shown ? p.role : undefined,
+      faction:    shown ? p.faction : undefined,
+      roleMeta:   shown ? ROLE_META[p.role] : undefined,
+    };
+  });
 
   // ── Build my own full role info ───────────────────────────────────────────
   const myRoleInfo = me
@@ -74,6 +80,8 @@ export function buildClientView(masterState, recipientId) {
     missionResults,   // { betrayalCount, totalCards, nawabWon } revealed after clash
     winner,           // 'NAWAB' | 'EIC' | null
     assassinationTarget,
+    // This game's EIC characters and whether each has abilities (public: never says who)
+    eicLineup:        eicLineup(players),
 
     // ── Private fields — only meaningful for this recipient ────────────────
     myId:      recipientId,
@@ -98,6 +106,7 @@ export function buildLobbyView(room, recipientId) {
       name:    p.name,
       isHost:  p.isHost || false,
       isReady: p.isReady || false,
+      look:    p.look,      // the statue they chose (cosmetic only)
     })),
     hostId:           room.hostId,
     enabledRoles:     room.enabledRoles || [],
@@ -108,10 +117,13 @@ export function buildLobbyView(room, recipientId) {
 }
 
 /**
- * Whether the current phase warrants full role disclosure to all clients.
+ * Whether this player's role is shown to everyone now: all roles once the game is over;
+ * during the assassination, only the EIC.
  */
-function shouldRevealRoles(phase) {
-  return phase === 'GAME_OVER' || phase === 'ASSASSINATION';
+function isRevealed(phase, player) {
+  if (phase === 'GAME_OVER') return true;
+  if (phase === 'ASSASSINATION') return player.faction === 'EIC';
+  return false;
 }
 
 function canRoomStart(room) {

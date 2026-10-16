@@ -25,3 +25,9 @@ Thumbs.db
 
 # Vercel
 .vercel/
+
+# Claude Code's local permissions (stay on this PC)
+.claude/settings.local.json
+
+# R history files
+.Rhistory

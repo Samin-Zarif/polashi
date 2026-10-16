@@ -27,8 +27,16 @@ export const IMAGES = {
     MIR_MODON:       '/assets/images/roles/mir-modon.png',
     // File: /public/assets/images/roles/mohon-lal.png
     MOHON_LAL:       '/assets/images/roles/mohon-lal.png',
-    // File: /public/assets/images/roles/loyal-soldier.png
-    LOYAL_SOLDIER:   '/assets/images/roles/loyal-soldier.png',
+    // File: /public/assets/images/roles/siraj.png
+    SIRAJ:           '/assets/images/roles/siraj.png',
+    // File: /public/assets/images/roles/lutfunnisa.png
+    LUTFUNNISA:      '/assets/images/roles/lutfunnisa.png',
+    // File: /public/assets/images/roles/st-frais.png
+    ST_FRAIS:        '/assets/images/roles/st-frais.png',
+    // File: /public/assets/images/roles/jean-law.png
+    JEAN_LAW:        '/assets/images/roles/jean-law.png',
+    // File: /public/assets/images/roles/de-bussy.png
+    DE_BUSSY:        '/assets/images/roles/de-bussy.png',
     // File: /public/assets/images/roles/mir-jafar.png
     MIR_JAFAR:       '/assets/images/roles/mir-jafar.png',
     // File: /public/assets/images/roles/ghaseti-begum.png
@@ -37,8 +45,11 @@ export const IMAGES = {
     RAY_DURLABH:     '/assets/images/roles/ray-durlabh.png',
     // File: /public/assets/images/roles/omichand.png
     OMICHAND:        '/assets/images/roles/omichand.png',
-    // File: /public/assets/images/roles/eic-conspirator.png
-    EIC_CONSPIRATOR: '/assets/images/roles/eic-conspirator.png',
+    // The same characters without abilities use the same portraits
+    RAY_DURLABH_PLAIN: '/assets/images/roles/ray-durlabh.png',
+    OMICHAND_PLAIN:    '/assets/images/roles/omichand.png',
+    // File: /public/assets/images/roles/jagat-seth.png
+    JAGAT_SETH:        '/assets/images/roles/jagat-seth.png',
   },
 
   // ── Map Puzzle Pieces ─────────────────────────────────────────────────────
@@ -100,8 +111,17 @@ export const SOUNDS = {
 
   // ── Mission ───────────────────────────────────────────────────────────────
   // File: /public/assets/sounds/clash-ambience.mp3
-  // Use: Looping battle ambience during MISSION_CLASH phase (~10s loop)
+  // Use: Looping battle ambience (with heavy rain) while the players who aren't on the team
+  //      wait during MISSION_CLASH (the rain at Palashi); stops dead when the last card is in (~15s loop)
   CLASH_AMBIENCE: '/assets/sounds/clash-ambience.mp3',
+
+  // File: /public/assets/sounds/cannon-boom.mp3
+  // Use: One close cannon shot for each card played during the rain at Palashi (~2s)
+  CANNON_BOOM: '/assets/sounds/cannon-boom.mp3',
+
+  // File: /public/assets/sounds/thunder.mp3
+  // Use: Thunder rolling in a moment after each lightning flash during the rain at Palashi (~4s)
+  THUNDER: '/assets/sounds/thunder.mp3',
 
   // File: /public/assets/sounds/mission-success.mp3
   // Use: Chapter won by Nawab — victory fanfare (~2s)

@@ -1,0 +1,208 @@
+/* POLASHI — WarTable3D (the painted war room) */
+
+.wtd-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0b0805;
+  touch-action: manipulation;
+}
+.wtd-wrap.is-pointing { cursor: pointer; }
+
+/* The picture stays invisible until it is loaded and drawn, then fades in */
+.wtd-stage,
+.wtd-labels {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.wtd-wrap.is-ready .wtd-stage,
+.wtd-wrap.is-ready .wtd-labels { opacity: 1; }
+.wtd-canvas { display: block; width: 100%; height: 100%; }
+.wtd-labels { pointer-events: none; }
+
+.wtd-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--gold-dim);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  animation: wtd-breathe 2.4s ease-in-out infinite;
+}
+.wtd-wrap.is-ready .wtd-loading { opacity: 0; animation: none; }
+@keyframes wtd-breathe {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.9; }
+}
+
+/* ── Name plates, just above each head ── */
+.wtd-name {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 7px));
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  pointer-events: none;
+  user-select: none;
+  /* reset for when it is a button */
+  margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit;
+}
+.wtd-name.is-button { pointer-events: auto; cursor: pointer; }
+.wtd-name.is-button:focus { outline: none; }
+.wtd-name.is-button:focus-visible .wtd-name__text { outline: 1px solid var(--gold-bright); outline-offset: 2px; }
+
+.wtd-name__text {
+  font-family: var(--font-heading);
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+  line-height: 1.5;
+  color: var(--parchment-light);
+  background: rgba(12, 9, 5, 0.62);
+  border: 1px solid rgba(201, 145, 58, 0.3);
+  padding: 0 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+.wtd-name__leader {
+  font-family: var(--font-heading);
+  font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
+  background: var(--gold); color: var(--ink-black);
+  padding: 1px 8px;
+  box-shadow: 0 0 10px rgba(232, 184, 75, 0.35);
+}
+.wtd-name__tag {
+  font-family: var(--font-heading);
+  font-size: 0.58rem; letter-spacing: 0.06em;
+  color: var(--text-dim);
+  background: rgba(12, 9, 5, 0.86);
+  border: 1px solid var(--parchment-deep);
+  padding: 0 7px;
+}
+.wtd-name__tag.yes { color: var(--nawab-bright); border-color: var(--nawab-green); }
+.wtd-name__tag.no  { color: var(--eic-bright);   border-color: var(--blood); }
+
+.wtd-name.intel-red    .wtd-name__text { color: #ff7a68; border-color: #b8281c; font-weight: 700; }
+.wtd-name.intel-yellow .wtd-name__text { color: #f5cf4a; border-color: #d4a017; font-weight: 700; }
+.wtd-name.is-on-team   .wtd-name__text { border-color: var(--nawab-bright); }
+.wtd-name.is-selected  .wtd-name__text { border-color: var(--gold-bright); box-shadow: 0 0 12px rgba(232, 184, 75, 0.45); }
+.wtd-name.is-hovered   .wtd-name__text { background: rgba(40, 30, 12, 0.8); border-color: var(--gold-bright); color: #fff3d6; }
+.wtd-name.is-me        .wtd-name__text { opacity: 0.88; }
+
+/* The flat 2D table, if the painted room can't be drawn */
+.wtd-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+.wtd-fallback > .wt-table-wrap { flex: 1; min-height: 0; padding: 60px 40px; background: transparent; border: 0; }
+
+@media (max-width: 600px) {
+  .wtd-name__text   { font-size: 0.62rem; padding: 0 6px; max-width: 104px; }
+  .wtd-name__leader { font-size: 0.48rem; padding: 0 6px; }
+  .wtd-name__tag    { font-size: 0.52rem; padding: 0 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wtd-stage, .wtd-labels, .wtd-loading { transition: none; }
+  .wtd-loading { animation: none; }
+}
+/* ── Name plates: no box. Off-white name on a soft shadow, a fine rule beneath ── */
+.wtd-name { gap: 3px; }
+.wtd-name__text {
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(8, 9, 10, 0.72) 0%, rgba(8, 9, 10, 0.45) 55%, rgba(8, 9, 10, 0) 75%);
+  border: 0; box-shadow: none; padding: 3px 16px 5px;
+  font-family: var(--font-heading); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: #e8e1d2; text-shadow: 0 1px 3px #000, 0 0 10px rgba(0, 0, 0, 0.8);
+}
+.wtd-name__text::after {
+  content: ''; position: absolute; left: 22%; right: 22%; bottom: 1px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232, 225, 210, 0.45), transparent);
+}
+.wtd-name.intel-red    .wtd-name__text { color: #e4907f; }
+.wtd-name.intel-red    .wtd-name__text::after { height: 2px; background: linear-gradient(90deg, transparent, #c2604f, transparent); }
+.wtd-name.intel-yellow .wtd-name__text { color: #e6cc8a; }
+.wtd-name.intel-yellow .wtd-name__text::after { height: 2px; background: linear-gradient(90deg, transparent, #cfae5c, transparent); }
+.wtd-name.is-on-team   .wtd-name__text::after { height: 2px; background: linear-gradient(90deg, transparent, #79a78f, transparent); }
+.wtd-name.is-selected  .wtd-name__text { color: #fff; }
+.wtd-name.is-selected  .wtd-name__text::after { height: 2px; background: linear-gradient(90deg, transparent, #d8c08e, transparent); }
+.wtd-name.is-hovered   .wtd-name__text { background: radial-gradient(ellipse at center, rgba(40, 36, 28, 0.8) 0%, rgba(8, 9, 10, 0.5) 55%, rgba(8, 9, 10, 0) 75%); border: 0; color: #fff; }
+.wtd-name__leader {
+  font-family: var(--font-heading); font-weight: 700; font-size: 0.6rem; letter-spacing: 0.26em; text-transform: uppercase;
+  background: radial-gradient(ellipse at center, rgba(8,9,10,0.75) 0%, rgba(8,9,10,0) 72%); padding: 1px 14px; color: #e3cc98; box-shadow: none; padding: 0; text-shadow: 0 1px 3px #000, 0 0 8px #000;
+}
+.wtd-name__tag { font-family: var(--font-heading); font-weight: 700; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; background: radial-gradient(ellipse at center, rgba(8,9,10,0.75) 0%, rgba(8,9,10,0) 72%); padding: 1px 12px; border: 0; text-shadow: 0 1px 3px #000; }
+.wtd-name__tag.yes { color: #9cc3ae; border: 0; }
+.wtd-name__tag.no  { color: #e4907f; border: 0; }
+@media (max-width: 600px) { .wtd-name__text { font-size: 0.6rem; letter-spacing: 0.1em; padding: 2px 10px 4px; } }
+
+
+/* legibility: bigger, brighter names with a crisp dark edge */
+.wtd-name__text { font-size: 0.8rem; font-weight: 700; color: #fffaf0;
+  text-shadow: 0 0 1px #000, 0 0 2px #000, 0 1px 3px #000, 0 0 12px rgba(0,0,0,0.9);
+  background: radial-gradient(ellipse at center, rgba(5,4,3,0.85) 0%, rgba(5,4,3,0.55) 55%, rgba(5,4,3,0) 78%); }
+.wtd-name.intel-red    .wtd-name__text { color: #ffa08c; }
+.wtd-name.intel-yellow .wtd-name__text { color: #ffdc80; }
+.wtd-name__leader { font-size: 0.66rem; color: #f5dca3; text-shadow: 0 0 1px #000, 0 0 2px #000, 0 1px 3px #000; }
+.wtd-name__tag { font-size: 0.68rem; text-shadow: 0 0 1px #000, 0 0 2px #000, 0 1px 3px #000; }
+.wtd-name__tag.yes { color: #9fe6b9; } .wtd-name__tag.no { color: #ff9a85; }
+@media (max-width: 600px) { .wtd-name__text { font-size: 0.64rem; } }
+
+/* legibility for names over the statues */
+.wtd-name__text { color: #fff8ea; font-weight: 700; font-size: 0.76rem;
+  background: radial-gradient(ellipse at center, rgba(6,6,7,0.85) 0%, rgba(6,6,7,0.6) 50%, rgba(6,6,7,0) 76%);
+  text-shadow: 0 1px 2px #000, 0 0 6px #000; }
+.wtd-name.intel-red .wtd-name__text { color: #ffb3a3; } .wtd-name.intel-yellow .wtd-name__text { color: #ffe08f; }
+.wtd-name__leader { color: #f0d292; }
+.wtd-name__tag.yes { color: #9fe0b8; } .wtd-name__tag.no { color: #ff9f8a; }
+
+/* the statue under the mouse: its name turns the same pale blue as its outline in the room */
+.wtd-name.is-hovered .wtd-name__text { color: #e6f3ff; }
+.wtd-name.is-hovered .wtd-name__text::after { height: 2px; left: 12%; right: 12%; background: linear-gradient(90deg, transparent, #a9d4ff, transparent); }
+
+/* ── Names: just the word, no box. A soft dark feather behind the letters keeps them readable
+   on light stone; the fine rule beneath still shows red / yellow / team / picked. ── */
+.wtd-name__text,
+.wtd-name.is-hovered .wtd-name__text,
+.wtd-name__leader,
+.wtd-name__tag {
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.wtd-name__text {
+  padding: 2px 4px 5px;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.85), 0 0 14px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 0, 0, 0.45);
+}
+.wtd-name__text::after { left: 10%; right: 10%; }
+.wtd-name__leader,
+.wtd-name__tag {
+  padding: 0 4px;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.85), 0 0 12px rgba(0, 0, 0, 0.6);
+}
+/* under the mouse: the name glows pale blue, like the statue's outline */
+.wtd-name.is-hovered .wtd-name__text {
+  color: #eef7ff;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.8), 0 0 12px rgba(150, 200, 255, 0.55), 0 0 22px rgba(0, 0, 0, 0.5);
+}
+
+/* the reveal (assassination and end): the character under the player's name, red for the
+   EIC, green for the Nawab's side */
+.wtd-name__role {
+  font-family: var(--font-heading); font-weight: 700; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0 12px;
+  background: radial-gradient(ellipse at center, rgba(6, 6, 7, 0.82) 0%, rgba(6, 6, 7, 0) 74%);
+  text-shadow: 0 0 1px #000, 0 0 2px #000, 0 1px 3px #000;
+  white-space: nowrap;
+  animation: fadeIn 0.8s ease both;
+}
+.wtd-name__role.eic   { color: #ff9a85; }
+.wtd-name__role.nawab { color: #9fe0b8; }
+@media (max-width: 600px) { .wtd-name__role { font-size: 0.54rem; letter-spacing: 0.12em; padding: 0 8px; white-space: normal; max-width: 96px; text-align: center; line-height: 1.3; } }

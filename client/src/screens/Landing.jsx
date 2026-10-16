@@ -4,6 +4,7 @@ import { BackgroundImage } from '../components/AssetImage';
 import { IMAGES } from '../assets/assetManifest';
 import { startBackgroundMusic } from '../hooks/useBgMusic';
 import SettingsPanel from '../components/SettingsPanel';
+import LoadingScreen from '../components/LoadingScreen';
 import '../components/SettingsPanel.css';
 import './Landing.css';
 
@@ -53,6 +54,8 @@ export default function Landing() {
   const handleKey = (e) => {
     if (e.key === 'Enter') tab === 'create' ? handleCreate() : handleJoin();
   };
+
+  if (!socket) return <LoadingScreen label="Raising the war tent" />;
 
   return (
     <div className="landing" onClick={handleFirstInteraction} onKeyDown={handleFirstInteraction}>

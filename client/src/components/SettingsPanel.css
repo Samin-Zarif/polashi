@@ -1,203 +1,195 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   POLASHI — Settings Panel
+   POLASHI — Sound settings, in the war room's style
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* ── Backdrop ─────────────────────────────────────────────────────────────── */
 .settings-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(3px);
   z-index: 200;
-  animation: fadeIn 0.2s ease both;
+  background: rgba(6, 6, 7, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: settings-fade 0.2s ease both;
 }
 
-/* ── Panel ────────────────────────────────────────────────────────────────── */
-.settings-panel {
+/* centres the panel; the panel's entrance animation then can't push it off-centre */
+.settings-layer {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
   z-index: 201;
-  width: min(440px, 92vw);
-  background: var(--tent-mid);
-  border: var(--border-glow);
-  box-shadow: var(--shadow-card), 0 0 60px rgba(201,145,58,0.15);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  pointer-events: none;
 }
 
-/* Corner ornaments */
+.settings-panel {
+  --ink: 10, 11, 12;
+  --text: #e8e1d2;
+  --muted: #9c9688;
+  --brass: #b39a6b;
+  --brass-hi: #d8c08e;
+  --line: rgba(232, 225, 210, 0.16);
+  --cut: 12px;
+  pointer-events: auto;
+  position: relative;
+  width: min(400px, 100%);
+  padding: 26px 30px 24px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(216, 192, 142, 0.07) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(var(--ink), 0.96) 0%, rgba(var(--ink), 0.92) 100%);
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
+                     calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  animation: settings-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+/* hairlines top and bottom, fading at the ends */
 .settings-panel::before,
 .settings-panel::after {
   content: '';
   position: absolute;
-  width: 32px;
-  height: 32px;
-  border-color: var(--gold-dim);
-  border-style: solid;
-  pointer-events: none;
-}
-.settings-panel::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
-.settings-panel::after  { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
-
-/* ── Header ───────────────────────────────────────────────────────────────── */
-.settings-panel__header {
-  padding: var(--space-lg) var(--space-xl) var(--space-md);
-  text-align: center;
-  border-bottom: var(--border-ornate);
-}
-.settings-panel__title-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-md);
-  margin-bottom: 4px;
-}
-.settings-panel__ornament {
-  color: var(--gold-dim);
-  font-size: 0.7rem;
-}
-.settings-panel__title {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--parchment-light);
-  letter-spacing: 0.05em;
-}
-.settings-panel__subtitle {
-  font-family: var(--font-heading);
-  font-size: 0.65rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gold-dim);
-}
-
-/* ── Body ─────────────────────────────────────────────────────────────────── */
-.settings-panel__body {
-  padding: var(--space-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.settings-panel__divider {
+  left: 10%;
+  right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--parchment-deep), transparent);
+  background: linear-gradient(90deg, transparent, var(--brass) 30%, var(--brass) 70%, transparent);
+  opacity: 0.55;
+  pointer-events: none;
 }
+.settings-panel::before { top: 0; }
+.settings-panel::after  { bottom: 0; }
 
-/* ── Footer ───────────────────────────────────────────────────────────────── */
-.settings-panel__footer {
-  padding: var(--space-md) var(--space-xl) var(--space-lg);
-  display: flex;
-  justify-content: center;
-  border-top: var(--border-ornate);
-}
-
-/* ── Slider ───────────────────────────────────────────────────────────────── */
-.settings-slider {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.settings-slider__header {
+.settings-panel__title {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-}
-.settings-slider__icon {
-  font-size: 1rem;
-  color: var(--gold);
-  width: 20px;
-  text-align: center;
-}
-.settings-slider__label {
+  gap: 12px;
+  margin: 0 0 18px;
   font-family: var(--font-heading);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--parchment);
+  color: var(--text);
+}
+.settings-panel__title::after {
+  content: '';
   flex: 1;
-}
-.settings-slider__value {
-  font-family: var(--font-heading);
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--gold);
-  min-width: 36px;
-  text-align: right;
+  height: 1px;
+  background: linear-gradient(90deg, var(--brass) 0 14px, var(--line) 14px, transparent);
 }
 
-/* ── Track ────────────────────────────────────────────────────────────────── */
-.settings-slider__track-wrap {
-  position: relative;
-  height: 6px;
-  background: var(--tent-dark);
-  border: 1px solid var(--parchment-deep);
-  /* Extra height area for thumb to be clickable */
-  margin: 14px 0 4px;
-}
-
-.settings-slider__fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-  pointer-events: none;
-  transition: width 0.05s linear;
-}
-
-/* ── Native range input — transparent, sits over the track ─────────────────── */
-.settings-slider__input {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 28px;
-  transform: translateY(-50%);
-  opacity: 0;
-  cursor: pointer;
-  margin: 0;
-  padding: 0;
-  z-index: 3;
-  -webkit-appearance: none;
-}
-
-/* ── Custom SVG Thumb ─────────────────────────────────────────────────────── */
-.settings-slider__thumb {
-  position: absolute;
-  top: 50%;
-  width: 28px;
-  height: 28px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  transition: left 0.05s linear;
-  z-index: 2;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
-}
-.settings-slider__thumb svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* Glow on active */
-.settings-slider__track-wrap:focus-within .settings-slider__thumb {
-  filter: drop-shadow(0 0 8px rgba(201,145,58,0.8)) drop-shadow(0 2px 6px rgba(0,0,0,0.6));
-}
-
-/* ── Ticks ────────────────────────────────────────────────────────────────── */
-.settings-slider__ticks {
+.settings-panel__rows {
   display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sound-row__head {
+  display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  padding: 0 2px;
+  margin-bottom: 8px;
 }
-.settings-slider__tick {
-  width: 2px;
-  height: 4px;
-  background: var(--parchment-deep);
-  transition: background 0.15s;
+.sound-row__label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
-.settings-slider__tick.active {
-  background: var(--gold-dim);
+.sound-row__value {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the slider: a hairline track, brass up to the value, a small brass diamond to drag */
+.sound-row__slider {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.sound-row__slider:focus { outline: none; }
+.sound-row__slider::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(90deg, var(--brass) 0 var(--pct), var(--line) var(--pct) 100%);
+}
+.sound-row__slider::-moz-range-track { height: 2px; background: var(--line); }
+.sound-row__slider::-moz-range-progress { height: 2px; background: var(--brass); }
+.sound-row__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border: 1px solid var(--brass-hi);
+  border-radius: 0;
+  background: rgb(var(--ink));
+  box-shadow: inset 0 0 0 2px rgb(var(--ink)), inset 0 0 0 6px var(--brass);
+  transform: rotate(45deg);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.sound-row__slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--brass-hi);
+  border-radius: 0;
+  background: var(--brass);
+  transform: rotate(45deg);
+}
+.sound-row__slider:hover::-webkit-slider-thumb,
+.sound-row__slider:focus-visible::-webkit-slider-thumb {
+  border-color: #fff;
+  box-shadow: inset 0 0 0 2px rgb(var(--ink)), inset 0 0 0 6px var(--brass-hi), 0 0 10px rgba(216, 192, 142, 0.55);
+}
+.sound-row__slider:focus-visible::-moz-range-thumb { border-color: #fff; box-shadow: 0 0 10px rgba(216, 192, 142, 0.55); }
+
+.settings-panel__footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+/* the same chamfered button as in the war room */
+.settings-panel__done {
+  --cut: 9px;
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  padding: 10px 34px;
+  background: rgba(179, 154, 107, 0.7);
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
+                     calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.74rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text);
+  cursor: pointer;
+}
+.settings-panel__done::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: rgb(18, 19, 20);
+  clip-path: inherit;
+  transition: background-color 0.2s ease;
+}
+.settings-panel__done:hover { color: #fff; background: var(--brass-hi); }
+.settings-panel__done:hover::before { background: rgb(48, 43, 33); }
+.settings-panel__done:focus-visible { outline: 1px solid var(--brass-hi); outline-offset: 3px; }
+
+@keyframes settings-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes settings-rise {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
 }
 
 /* ── Settings gear button (shown in headers) ─────────────────────────────── */

@@ -1,0 +1,98 @@
+/* POLASHI — PlayerTableSVG (single-SVG war table, WebGL-unavailable fallback) */
+
+.wt3b-stage {
+  position: relative;
+  width: min(940px, 98%);
+  max-width: calc((100vh - 290px) * 1.6667); /* keep it fitting vertically */
+  aspect-ratio: 1000 / 600;
+  margin: 0 auto;
+}
+.wt3b-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* room atmosphere — faint corridor light above, darkness pooling below */
+.wt3b-stage::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 4%, rgba(201,145,58,0.09) 0%, transparent 42%),
+    radial-gradient(ellipse at 50% 118%, rgba(0,0,0,0.55) 0%, transparent 62%);
+  pointer-events: none;
+}
+/* breathing candlelight over the wood */
+.wt3b-stage::after {
+  content: '';
+  position: absolute;
+  left: 25%; right: 25%; top: 39%; bottom: 35%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(232,184,75,0.13) 0%, transparent 70%);
+  animation: wt3-candle 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── Figures — neutral stone grey; state lights the WHOLE figure ── */
+.wt3b-fig {
+  color: #9a9da2;
+  cursor: default;
+  transition: color 0.25s ease, filter 0.25s ease;
+}
+.wt3b-body        { fill: currentColor; }
+.wt3b-lite        { fill: rgba(255,255,255,0.26); }
+.wt3b-chair       { fill: #221c14; stroke: rgba(201,145,58,0.25); stroke-width: 1.5; }
+.wt3b-chair2      { fill: #2c251b; }
+.wt3b-chairfront  { fill: #262019; stroke: rgba(201,145,58,0.30); stroke-width: 1.5; }
+.wt3b-chairfront2 { fill: #31291e; }
+.wt3b-check       { fill: var(--nawab-bright); }
+
+.wt3b-fig.selectable { cursor: pointer; }
+.wt3b-fig.selectable:hover {
+  color: #dcc48b;
+  filter: drop-shadow(0 0 14px rgba(232,184,75,0.8));
+}
+.wt3b-fig.is-me        { color: #b3b6ba; }
+.wt3b-fig.is-leader    { filter: drop-shadow(0 0 10px rgba(201,145,58,0.5)); }
+.wt3b-fig.is-on-team   { color: var(--nawab-bright); filter: drop-shadow(0 0 15px rgba(46,204,113,0.75)); }
+.wt3b-fig.is-selected  { color: var(--gold-bright);  filter: drop-shadow(0 0 20px rgba(232,184,75,0.95)); }
+.wt3b-fig.intel-red    { color: #ff5348 !important;  filter: drop-shadow(0 0 17px rgba(255,70,50,0.85)); }
+.wt3b-fig.intel-yellow { color: #f5c93e !important;  filter: drop-shadow(0 0 17px rgba(245,201,62,0.8)); }
+
+/* ── Name plaques ── */
+.wt3b-name {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  pointer-events: none;
+  z-index: 5;
+}
+.wt3b-name__text {
+  font-family: var(--font-heading);
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--parchment-light);
+  background: rgba(12,9,5,0.93);
+  border: 1px solid rgba(201,145,58,0.4);
+  padding: 2px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+  white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis;
+}
+.wt3b-name__leader {
+  font-family: var(--font-heading);
+  font-size: 0.5rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--gold); color: var(--ink-black);
+  padding: 1px 8px;
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+.wt3b-name__tag {
+  font-family: var(--font-heading);
+  font-size: 0.55rem; letter-spacing: 0.08em;
+  color: var(--text-dim);
+  background: rgba(12,9,5,0.92);
+  border: 1px solid var(--parchment-deep);
+  padding: 1px 7px;
+}
+.wt3b-name__tag.yes { color: var(--nawab-bright); border-color: var(--nawab-green); }
+.wt3b-name__tag.no  { color: var(--eic-bright);   border-color: var(--blood); }
+
+.wt3b-name.intel-red    .wt3b-name__text { color: #ff6b5a; border-color: #ff5348; font-weight: 700; }
+.wt3b-name.intel-yellow .wt3b-name__text { color: #f5c93e; border-color: #f5c93e; font-weight: 700; }
+.wt3b-name.is-selected  .wt3b-name__text { color: var(--gold-bright); border-color: var(--gold-bright); }
+.wt3b-name.is-on-team   .wt3b-name__text { color: var(--nawab-bright); border-color: var(--nawab-green); }
+.wt3b-name.is-leader    .wt3b-name__text { border-color: var(--gold); }

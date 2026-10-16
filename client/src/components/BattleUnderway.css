@@ -1,0 +1,159 @@
+/* POLASHI — Battle underway: the rain at Palashi (full screen, over the war tent) */
+.bu-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  overflow: hidden;
+  background: #05070b;
+  animation: bu-in 0.8s ease both;
+}
+@keyframes bu-in { from { opacity: 0; } to { opacity: 1; } }
+/* the end: the rain has stopped; after a breath of silence the whole scene fades to the result */
+.bu-overlay.is-ending { animation: bu-out 0.6s ease 1.25s both; }
+@keyframes bu-out { from { opacity: 1; } to { opacity: 0; } }
+
+.bu-scene { position: absolute; inset: -12px; overflow: hidden; container-type: size; }   /* a little bleed so the shake never shows an edge */
+/* The painting (2048 x 1144) on a stage of the same shape, cut to fill the screen like a cover photo.
+   Everything placed on it is in percent of the picture, so it stays on its fire or gun on any screen.
+   The whole stage creeps slowly closer and back, like a camera breathing. */
+.bu-stage {
+  position: absolute; left: 50%; top: 50%;
+  width: max(100cqw, 179.02cqh); height: max(100cqh, 55.86cqw);
+  transform: translate(-50%, -50%);
+  animation: bu-push 34s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes bu-push { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.04); } }
+/* the storm sky (the top two thirds of the painting) drifts slowly behind the army */
+.bu-sky {
+  position: absolute; left: 0; top: 0; width: 100%; height: 66%;
+  display: block; user-select: none; pointer-events: none;
+  transform-origin: 50% 85%;
+  animation: bu-sky 42s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes bu-sky { from { transform: translateX(2%) scale(1.06); } to { transform: translateX(-2%) scale(1.06); } }
+/* cloud shadows rolling across it (a strip two tiles wide, slid by one tile, so it never jumps) */
+.bu-clouds {
+  position: absolute; left: 0; top: 0; width: 200%; height: 52%;
+  background-repeat: repeat-x; background-size: 50% 100%;
+  opacity: 0.85;
+  animation: bu-clouds 110s linear infinite;
+  will-change: transform; pointer-events: none;
+}
+@keyframes bu-clouds { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* lightning: the sky lights up behind the army (the silhouettes stay black against it) */
+.bu-lightning {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background:
+    radial-gradient(ellipse 34% 44% at var(--bx, 30%) 20%, rgba(228, 234, 255, 0.85) 0%, rgba(160, 178, 235, 0.32) 45%, transparent 75%),
+    linear-gradient(to bottom, rgba(190, 205, 245, 0.3) 0%, rgba(190, 205, 245, 0.12) 40%, transparent 62%);
+}
+.bu-field {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: block; user-select: none; pointer-events: none;
+}
+/* the fires and the tent lamps flicker */
+.bu-fire {
+  position: absolute; width: calc(3.2% * var(--s, 1)); height: calc(4.6% * var(--s, 1));
+  transform: translate(-50%, -62%);
+  background: radial-gradient(closest-side, rgba(255, 190, 110, 0.6) 0%, rgba(255, 120, 40, 0.24) 48%, transparent 100%);
+  animation: bu-flicker 1.9s ease-in-out infinite;
+  pointer-events: none;
+}
+.bu-fire--tent { width: 2.4%; height: 3.2%; animation-duration: 2.6s; }
+@keyframes bu-flicker {
+  0%   { opacity: 0.55; transform: translate(-50%, -62%) scale(0.92); }
+  18%  { opacity: 0.95; transform: translate(-50%, -64%) scale(1.06); }
+  34%  { opacity: 0.6;  transform: translate(-50%, -61%) scale(0.95); }
+  52%  { opacity: 1;    transform: translate(-50%, -65%) scale(1.1); }
+  70%  { opacity: 0.7;  transform: translate(-50%, -62%) scale(0.97); }
+  86%  { opacity: 0.9;  transform: translate(-50%, -63%) scale(1.03); }
+  100% { opacity: 0.55; transform: translate(-50%, -62%) scale(0.92); }
+}
+/* smoke banks drifting left across the field with the wind */
+.bu-smoke {
+  position: absolute; left: 100%; aspect-ratio: 720 / 260;
+  background-size: 100% 100%; background-repeat: no-repeat;
+  opacity: 0;
+  animation: bu-smoke 60s linear infinite;
+  will-change: transform, opacity; pointer-events: none;
+}
+@keyframes bu-smoke {
+  0%   { transform: translateX(0); opacity: 0; }
+  12%  { opacity: 0.6; }
+  85%  { opacity: 0.6; }
+  100% { transform: translateX(var(--travel, -300%)); opacity: 0; }
+}
+/* gunfire light. Far guns sit between the sky and the field, so the army stands black against them */
+.bu-far, .bu-near { position: absolute; inset: 0; pointer-events: none; }
+.bu-glow {
+  position: absolute; width: 7%; height: 9%;
+  transform: translate(-50%, -55%);
+  background: radial-gradient(closest-side, rgba(255, 214, 150, 0.9) 0%, rgba(255, 140, 60, 0.35) 40%, transparent 100%);
+  opacity: 0;
+}
+.bu-glow--near {
+  width: 24%; height: 32%;
+  background: radial-gradient(closest-side, rgba(255, 220, 160, 0.5) 0%, rgba(255, 150, 70, 0.22) 40%, transparent 100%);
+}
+/* the gun's own blaze: a white-hot core thrown up and to the right, along the barrel */
+.bu-muzzle {
+  position: absolute; width: 6%; height: 3.4%;
+  transform: translate(-20%, -50%) rotate(-24deg);
+  transform-origin: 20% 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 240, 1) 0%, rgba(255, 236, 170, 0.9) 22%, rgba(255, 170, 70, 0.55) 48%, rgba(255, 110, 40, 0.18) 72%, transparent 100%);
+  border-radius: 50%;
+  opacity: 0;
+}
+/* a musket firing down the line: a tiny bright prick of light */
+.bu-spark {
+  position: absolute; width: 1.5%; height: 2%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 250, 220, 1) 0%, rgba(255, 200, 120, 0.6) 35%, transparent 100%);
+  opacity: 0;
+}
+/* the gun's smoke, billowing out and drifting away */
+.bu-puff {
+  position: absolute; width: 10%; aspect-ratio: 720 / 260;
+  transform: translate(-50%, -50%);
+  background: url('/assets/images/battle/smoke-1.webp') center / 100% 100% no-repeat;
+  opacity: 0;
+}
+.bu-rain { position: absolute; inset: 0; width: 100%; height: 100%; }
+.bu-flash {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at 50% 64%, rgba(255, 210, 150, 0.5) 0%, rgba(255, 170, 100, 0.22) 45%, rgba(255, 150, 80, 0.1) 100%);
+}
+
+.bu-text {
+  position: absolute; left: 16px; right: 16px; top: 11%;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+.bu-title {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.9rem, 5vw, 3.6rem); line-height: 1.1;
+  color: #e9dcc0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9), 0 0 2px #000;
+  text-wrap: balance;
+}
+.bu-count {
+  font-family: var(--font-heading); font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+  letter-spacing: 0.26em; text-transform: uppercase;
+  padding-left: 0.26em;
+  color: #b9ab8c;
+  text-shadow: 0 1px 8px #000;
+}
+.bu-note {
+  font-family: var(--font-body); font-style: italic; font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  color: #e4907f;
+  text-shadow: 0 1px 8px #000;
+}
+.bu-overlay.is-ending .bu-count { color: #d8cfbe; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bu-stage { animation: none; }
+  .bu-sky { animation: none; transform: scale(1.06); }
+  .bu-clouds, .bu-smoke { animation: none; }
+  .bu-fire { animation: none; opacity: 0.75; }
+}
