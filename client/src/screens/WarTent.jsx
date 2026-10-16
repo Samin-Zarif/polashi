@@ -409,7 +409,7 @@ function GameOverScreen({ gameState }) {
         ))}
       </div>
 
-      <button className="btn btn-primary" onClick={()=>{ try { useGameStore.getState().clearSession(); } catch {} window.location.reload(); }}
+      <button className="btn btn-primary" onClick={()=>{ const s = useGameStore.getState().socket; if (s) s.emit('play_again'); }}
         style={{padding:'16px 56px',fontSize:'1rem',letterSpacing:'0.2em',marginTop:'var(--space-xl)'}}>
         Play Again
       </button>

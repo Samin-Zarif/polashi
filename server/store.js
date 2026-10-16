@@ -120,6 +120,42 @@ export function resetVotes(room) {
   room.players.forEach(p => { p.hasVoted = false; });
 }
 
+// After a verdict: the same room goes back to its lobby, with the same code and the people
+// still connected. Anyone who left during the game is dropped; roles, votes and scores are cleared.
+export function resetRoomForNewGame(roomId) {
+  const room = getRoom(roomId);
+  if (!room) return null;
+
+  room.players = room.players.filter(p => p.socketId);
+  if (room.players.length === 0) {
+    deleteRoom(roomId);
+    return null;
+  }
+  if (!room.players.some(p => p.id === room.hostId)) room.hostId = room.players[0].id;
+
+  room.players = room.players.map(p => {
+    const { role, faction, hasVoted, missionCardSubmitted, disconnected, ...kept } = p;
+    return { ...kept, isHost: p.id === room.hostId, isReady: false };
+  });
+
+  room.phase          = PHASES.LOBBY;
+  room.chapter        = 1;
+  room.leaderIndex    = 0;
+  room.rejectionCount = 0;
+  room.chapterScores  = Array(TOTAL_CHAPTERS).fill(null);
+  room.missionHistory = [];
+  room.privateIntel   = {};
+  room.teamProposal   = [];
+  room.votes          = {};
+  room.votesRevealed  = false;
+  room.missionCards   = {};
+  room.missionResults = null;
+  room.winner         = null;
+  room.assassinationTarget = null;
+  // room.enabledRoles stays: the host's choice of optional characters carries over
+  return room;
+}
+
 export function resetMissionCards(room) {
   room.missionCards = {};
   room.players.forEach(p => { p.missionCardSubmitted = false; });

@@ -15,7 +15,7 @@ import {
   createRoom, getRoom, addPlayerToRoom, removePlayerFromRoom,
   findRoomByPlayerId, setEnabledRoles,
   getTeamSizeForCurrentChapter, nawabScore, eicScore,
-  advanceLeader, resetVotes, resetMissionCards,
+  advanceLeader, resetVotes, resetMissionCards, resetRoomForNewGame,
 } from './store.js';
 
 // ─── Express + Socket.IO Setup ────────────────────────────────────────────────
@@ -338,6 +338,19 @@ io.on('connection', (socket) => {
       socket.emit('game_state', buildClientView(room, playerId));
     }
     console.log(`[RECONNECT] Player ${playerId} rejoined ${roomId}`);
+  });
+
+  // ── PLAY AGAIN (after the verdict: everyone in the room goes back to its lobby) ──
+  socket.on('play_again', () => {
+    const { roomId, playerId } = socket.data || {};
+    const room = getRoom(roomId);
+    if (!room) return emitError(socket, 'Room no longer exists.');
+    if (room.phase !== PHASES.GAME_OVER) return;
+    if (!room.players.some(p => p.id === playerId)) return;
+
+    const lobby = resetRoomForNewGame(roomId);
+    if (lobby) broadcastLobbyState(lobby);
+    console.log(`[PLAY AGAIN] Room ${roomId} back in the lobby`);
   });
 });
 
