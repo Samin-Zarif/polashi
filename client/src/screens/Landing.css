@@ -214,7 +214,18 @@
 }
 .landing__content, .landing__footer { position: relative; z-index: 2; }
 
-/* ═══ Atmosphere: deep vignette + film grain (no banding on dark gradients) ═══ */
+/* ═══ Atmosphere v2: cold near-black, crimson smoke, film grain (no brown) ═══ */
+.landing { background: #030305; }
+.landing__bg {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 118%, rgba(122,14,22,0.34) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 45% at 8% 0%, rgba(20,30,48,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 45% at 96% 12%, rgba(18,26,40,0.4) 0%, transparent 70%),
+    #030305;
+}
+.landing__bg-overlay {
+  background: linear-gradient(180deg, rgba(3,3,5,0.2) 0%, rgba(3,3,5,0.05) 45%, rgba(3,3,5,0.85) 100%);
+}
 .landing::before {
   content: '';
   position: fixed;
@@ -222,12 +233,21 @@
   background-image: url('/assets/images/grain.png');
   background-size: 256px 256px;
   mix-blend-mode: overlay;
-  opacity: 0.55;
+  opacity: 0.5;
   pointer-events: none;
   z-index: 1;
 }
-.landing__bg {
-  background:
-    radial-gradient(ellipse 60% 45% at 50% 38%, rgba(120,22,18,0.22) 0%, transparent 70%),
-    radial-gradient(ellipse 90% 70% at 50% 50%, #120d08 0%, #070504 70%, #030202 100%);
+.landing__particle { background: #c2372d; }
+.landing__year { color: rgba(216,210,196,0.55); }
+.landing__form-wrap {
+  background: rgba(8,8,11,0.82);
+  border: 1px solid rgba(179,38,30,0.45);
 }
+.landing__tab.active { color: #e6e1d6; border-bottom-color: #b3261e; }
+.landing .btn.btn-primary {
+  background: linear-gradient(180deg, #a3231b 0%, #6e1510 100%);
+  border: 1px solid rgba(179,38,30,0.9);
+  color: #f2ece0;
+  box-shadow: 0 0 24px rgba(179,38,30,0.25);
+}
+.landing .btn.btn-primary:hover { box-shadow: 0 0 34px rgba(179,38,30,0.5); }

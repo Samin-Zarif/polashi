@@ -22,8 +22,10 @@
   gap: clamp(18px, 3.2vh, 34px);
   padding: clamp(20px, 5vh, 56px) 16px;
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(201,145,58,0.1) 0%, transparent 60%),
-    var(--ink-black);
+    url('/assets/images/grain.png') 0 0 / 256px 256px,
+    radial-gradient(ellipse 70% 60% at 50% 115%, rgba(122,14,22,0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(20,30,48,0.5) 0%, transparent 70%),
+    #030305;
   overflow-x: hidden;
 }
 
@@ -436,20 +438,20 @@
   gap: 3.5cqw;
   background:
     url('/assets/images/grain.png') 0 0 / 256px 256px,
-    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(120,22,18,0.28) 0%, transparent 70%),
-    radial-gradient(ellipse 100% 90% at 50% 50%, #17110a 0%, #080605 75%);
-  border: 1px solid var(--gold-dim);
-  box-shadow: var(--shadow-card), 0 0 30px rgba(201,145,58,0.2);
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(179,38,30,0.2) 0%, transparent 70%),
+    linear-gradient(180deg, #0d0d11 0%, #040406 100%);
+  border: 1px solid rgba(179,38,30,0.55);
+  box-shadow: var(--shadow-card), 0 0 30px rgba(179,38,30,0.35);
 }
 .role-card-scene:not(.is-turned) .role-card-back { animation: card-back-glow 2s ease-in-out infinite; }
 @keyframes card-back-glow {
-  0%, 100% { box-shadow: var(--shadow-card), 0 0 18px rgba(201,145,58,0.25); }
-  50%      { box-shadow: var(--shadow-card), 0 0 46px rgba(201,145,58,0.6); }
+  0%, 100% { box-shadow: var(--shadow-card), 0 0 18px rgba(179,38,30,0.3); }
+  50%      { box-shadow: var(--shadow-card), 0 0 46px rgba(179,38,30,0.7); }
 }
 .role-card-back__frame {
   position: absolute;
   inset: 3.6cqw;
-  border: 1px solid rgba(201,145,58,0.28);
+  border: 1px solid rgba(217,210,196,0.14);
   pointer-events: none;
 }
 .role-card-back__frame::before,
@@ -458,11 +460,11 @@
   position: absolute;
   width: 7cqw;
   height: 7cqw;
-  border: 0 solid var(--gold-dim);
+  border: 0 solid rgba(179,38,30,0.9);
 }
 .role-card-back__frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
 .role-card-back__frame::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
-.role-card-back__emblem { width: 58cqw; height: auto; }
+.role-card-back__emblem { width: 44cqw; height: auto; }
 .role-card-back__emblem svg { width: 100%; height: 100%; }   /* fallback emblem */
 .role-card-back__title {
   font-family: var(--font-display);
@@ -470,12 +472,12 @@
   letter-spacing: 0.28em;
   margin-right: -0.28em;   /* re-centre: letter-spacing adds space after the last letter */
   text-transform: uppercase;
-  color: var(--gold);
+  color: #d9d2c4;
 }
 .role-card-back__year {
   font-family: var(--font-heading);
   font-size: 4cqw;
   letter-spacing: 0.4em;
   margin-right: -0.4em;
-  color: var(--gold-dim);
+  color: rgba(217,210,196,0.55);
 }
