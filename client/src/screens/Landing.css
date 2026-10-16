@@ -213,3 +213,21 @@
   z-index: 1;
 }
 .landing__content, .landing__footer { position: relative; z-index: 2; }
+
+/* ═══ Atmosphere: deep vignette + film grain (no banding on dark gradients) ═══ */
+.landing::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/assets/images/grain.png');
+  background-size: 256px 256px;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 1;
+}
+.landing__bg {
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 38%, rgba(120,22,18,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 90% 70% at 50% 50%, #120d08 0%, #070504 70%, #030202 100%);
+}

@@ -70,7 +70,6 @@ export default function Landing() {
       <div className="landing__content">
         <p className="landing__year">১৭৫৭ · The Battle of Palashi</p>
         <h1 className="landing__title">POLASHI</h1>
-        <p className="landing__subtitle">A Game of Loyalty &amp; Betrayal</p>
         <div className="landing__form-wrap animate-scale">
           <div className="landing__tabs" role="tablist">
             <button className={`landing__tab${tab === 'create' ? ' active' : ''}`}
@@ -109,7 +108,6 @@ export default function Landing() {
           {!socket && <p className="text-muted text-sm text-center mt-sm">Connecting to the war tent&hellip;</p>}
         </div>
       </div>
-      <p className="landing__footer">1757 &middot; Bengal &middot; Social Deduction &middot; 5&ndash;10 Players</p>
 
       {/* Settings gear — fixed top right */}
       <button className="settings-btn" onClick={() => setShowSettings(true)}
