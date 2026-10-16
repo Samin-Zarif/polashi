@@ -1,7 +1,7 @@
 # ⚔ Polashi — The 1757 Battle of Palashi
 
 A real-time, multiplayer social deduction web game set in the Battle of Palashi.
-Built on the Resistance/Avalon engine with a full Bangladeshi historical theme.
+
 
 ---
 
