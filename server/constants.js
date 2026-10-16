@@ -64,8 +64,8 @@ export const ROLE_META = {
     displayName: 'Nawab Siraj ud-Daulah',
     title: 'The Last Nawab',
     description:
-      'Every knee bends to you. Not every heart.',
-    mandatory: false,
+      'Every knee bends to you. Not every heart. Always in the game.',
+    mandatory: true,
   },
   [ROLES.LUTFUNNISA]: {
     abilities: false,

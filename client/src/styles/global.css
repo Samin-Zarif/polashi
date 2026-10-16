@@ -1,6 +1,6 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    POLASHI — Global Design System
-   Palette: Deep Battle Night + Aged Parchment + Blood & Gold
+   Palette: 1757 Bengal — indigo night, muslin ivory, brass (red only marks the Company)
    ───────────────────────────────────────────────────────────────────────────── */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cinzel+Decorative:wght@400;700&display=swap');
@@ -8,28 +8,28 @@
 /* ── Token System ─────────────────────────────────────────────────────────── */
 :root {
   /* Core Palette */
-  --ink-black:      #0a0805;
-  --midnight:       #110e09;
-  --tent-dark:      #1a1510;
-  --tent-mid:       #231d15;
-  --tent-warm:      #2e2518;
-  --parchment-deep: #3d3020;
-  --parchment:      #c4a96d;
-  --parchment-light:#dfc898;
-  --gold:           #c9913a;
-  --gold-bright:    #e8b84b;
-  --gold-dim:       #7a5a1f;
-  --blood:          #8b1a1a;
-  --blood-bright:   #c0392b;
-  --nawab-green:    #1e5c2e;
-  --nawab-bright:   #2ecc71;
-  --eic-red:        #8b1a1a;
-  --eic-bright:     #e74c3c;
-  --suspect-yellow: #d4a017;
-  --muted:          #6b5a3e;
-  --text-primary:   #dfc898;
-  --text-dim:       #9a8060;
-  --text-faint:     #5a4830;
+  --ink-black:      #060913;
+  --midnight:       #0a1020;
+  --tent-dark:      #101a31;
+  --tent-mid:       #18233f;
+  --tent-warm:      #213056;
+  --parchment-deep: #2b3a62;
+  --parchment:      #d6c7a1;
+  --parchment-light:#efe6cf;
+  --gold:           #d1aa58;
+  --gold-bright:    #f2d48c;
+  --gold-dim:       #7d8db5;
+  --blood:          #7d2a2a;
+  --blood-bright:   #d1534e;
+  --nawab-green:    #1f6b5a;
+  --nawab-bright:   #4fd1a5;
+  --eic-red:        #7d2a2a;
+  --eic-bright:     #e0645c;
+  --suspect-yellow: #e0b53c;
+  --muted:          #6f7ea3;
+  --text-primary:   #e4dccb;
+  --text-dim:       #9aa6c4;
+  --text-faint:     #5b6685;
 
   /* Spacing */
   --space-xs:  4px;
@@ -50,7 +50,7 @@
 
   /* Shadows */
   --shadow-card:   0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
-  --shadow-glow:   0 0 20px rgba(201,145,58,0.3);
+  --shadow-glow:   0 0 20px rgba(120,140,220,0.3);
   --shadow-inset:  inset 0 2px 8px rgba(0,0,0,0.5);
 
   /* Transitions */

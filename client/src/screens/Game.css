@@ -23,9 +23,9 @@
   padding: clamp(20px, 5vh, 56px) 16px;
   background:
     url('/assets/images/grain.png') 0 0 / 256px 256px,
-    radial-gradient(ellipse 70% 60% at 50% 115%, rgba(122,14,22,0.3) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(20,30,48,0.5) 0%, transparent 70%),
-    #030305;
+    radial-gradient(ellipse 70% 60% at 50% 115%, rgba(48,70,128,0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(92,112,176,0.25) 0%, transparent 70%),
+    #060913;
   overflow-x: hidden;
 }
 
@@ -438,15 +438,15 @@
   gap: 3.5cqw;
   background:
     url('/assets/images/grain.png') 0 0 / 256px 256px,
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(179,38,30,0.2) 0%, transparent 70%),
-    linear-gradient(180deg, #0d0d11 0%, #040406 100%);
-  border: 1px solid rgba(179,38,30,0.55);
-  box-shadow: var(--shadow-card), 0 0 30px rgba(179,38,30,0.35);
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(92,112,176,0.2) 0%, transparent 70%),
+    linear-gradient(180deg, #0c1224 0%, #050810 100%);
+  border: 1px solid rgba(125,141,181,0.55);
+  box-shadow: var(--shadow-card), 0 0 30px rgba(120,140,220,0.3);
 }
 .role-card-scene:not(.is-turned) .role-card-back { animation: card-back-glow 2s ease-in-out infinite; }
 @keyframes card-back-glow {
-  0%, 100% { box-shadow: var(--shadow-card), 0 0 18px rgba(179,38,30,0.3); }
-  50%      { box-shadow: var(--shadow-card), 0 0 46px rgba(179,38,30,0.7); }
+  0%, 100% { box-shadow: var(--shadow-card), 0 0 18px rgba(120,140,220,0.25); }
+  50%      { box-shadow: var(--shadow-card), 0 0 46px rgba(120,140,220,0.6); }
 }
 .role-card-back__frame {
   position: absolute;
@@ -460,7 +460,7 @@
   position: absolute;
   width: 7cqw;
   height: 7cqw;
-  border: 0 solid rgba(179,38,30,0.9);
+  border: 0 solid #d1aa58;
 }
 .role-card-back__frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
 .role-card-back__frame::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
@@ -479,5 +479,5 @@
   font-size: 4cqw;
   letter-spacing: 0.4em;
   margin-right: -0.4em;
-  color: rgba(217,210,196,0.55);
+  color: rgba(214,199,161,0.6);
 }

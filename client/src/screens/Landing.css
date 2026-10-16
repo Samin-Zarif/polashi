@@ -214,17 +214,16 @@
 }
 .landing__content, .landing__footer { position: relative; z-index: 2; }
 
-/* ═══ Atmosphere v2: cold near-black, crimson smoke, film grain (no brown) ═══ */
-.landing { background: #030305; }
+/* ═══ Atmosphere v3: 1757 Bengal night — indigo, moonlit haze, muslin and brass ═══ */
+.landing { background: #060913; }
 .landing__bg {
   background:
-    radial-gradient(ellipse 70% 55% at 50% 118%, rgba(122,14,22,0.34) 0%, transparent 70%),
-    radial-gradient(ellipse 55% 45% at 8% 0%, rgba(20,30,48,0.55) 0%, transparent 70%),
-    radial-gradient(ellipse 55% 45% at 96% 12%, rgba(18,26,40,0.4) 0%, transparent 70%),
-    #030305;
+    radial-gradient(ellipse 60% 50% at 50% -8%, rgba(92,112,176,0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 55% at 50% 118%, rgba(48,70,128,0.3) 0%, transparent 70%),
+    #060913;
 }
 .landing__bg-overlay {
-  background: linear-gradient(180deg, rgba(3,3,5,0.2) 0%, rgba(3,3,5,0.05) 45%, rgba(3,3,5,0.85) 100%);
+  background: linear-gradient(180deg, rgba(6,9,19,0.2) 0%, rgba(6,9,19,0.05) 45%, rgba(6,9,19,0.85) 100%);
 }
 .landing::before {
   content: '';
@@ -237,17 +236,17 @@
   pointer-events: none;
   z-index: 1;
 }
-.landing__particle { background: #c2372d; }
-.landing__year { color: rgba(216,210,196,0.55); }
+.landing__particle { background: #e7c97a; }
+.landing__year { color: rgba(214,199,161,0.6); }
 .landing__form-wrap {
-  background: rgba(8,8,11,0.82);
-  border: 1px solid rgba(179,38,30,0.45);
+  background: rgba(10,16,32,0.84);
+  border: 1px solid rgba(125,141,181,0.4);
 }
-.landing__tab.active { color: #e6e1d6; border-bottom-color: #b3261e; }
+.landing__tab.active { color: #efe6cf; border-bottom-color: #d1aa58; }
 .landing .btn.btn-primary {
-  background: linear-gradient(180deg, #a3231b 0%, #6e1510 100%);
-  border: 1px solid rgba(179,38,30,0.9);
-  color: #f2ece0;
-  box-shadow: 0 0 24px rgba(179,38,30,0.25);
+  background: linear-gradient(180deg, #e0bd6c 0%, #b48b3f 100%);
+  border: 1px solid rgba(242,212,140,0.8);
+  color: #0a1020;
+  box-shadow: 0 0 24px rgba(209,170,88,0.2);
 }
-.landing .btn.btn-primary:hover { box-shadow: 0 0 34px rgba(179,38,30,0.5); }
+.landing .btn.btn-primary:hover { box-shadow: 0 0 34px rgba(209,170,88,0.4); }

@@ -11,7 +11,6 @@ import {
 
 // Pool of named powerless Nawab roles — randomly drawn to fill generic slots
 const NAWAB_GENERIC_POOL = [
-  ROLES.SIRAJ,
   ROLES.LUTFUNNISA,
   ROLES.ST_FRAIS,
   ROLES.JEAN_LAW,
@@ -35,7 +34,8 @@ export function buildRolePool(playerCount, enabledOptionalRoles = []) {
   const { nawab, eic } = FACTION_COUNTS[playerCount];
 
   // ── Mandatory roles ──────────────────────────────────────────────────────
-  const nawabRoles = [ROLES.MIR_MODON];
+  // Mir Modon and Nawab Siraj ud-Daulah are always in the game; the rest of the Nawab places are optional or drawn.
+  const nawabRoles = [ROLES.MIR_MODON, ROLES.SIRAJ];
   const eicRoles   = [ROLES.MIR_JAFAR];
 
   // ── Optional roles requested by host ─────────────────────────────────────

@@ -14,6 +14,7 @@ const OPTIONAL_ROLES = [
 
 const MANDATORY_ROLES = [
   { key: 'MIR_MODON', name: 'Mir Modon', faction: 'NAWAB', desc: 'The Seer. Always in the game.' },
+  { key: 'SIRAJ', name: 'Siraj ud-Daulah', faction: 'NAWAB', desc: 'The Last Nawab. Always in the game.' },
   { key: 'MIR_JAFAR', name: 'Mir Jafar', faction: 'EIC',   desc: 'The Great Traitor. Always in the game.' },
 ];
 
